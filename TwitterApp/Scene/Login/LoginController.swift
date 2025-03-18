@@ -9,6 +9,14 @@ import UIKit
 
 class LoginController: UIViewController {
     // MARK: - UI Elements
+    private let logoImageView: UIImageView = {
+          let imageView = UIImageView()
+          imageView.image = UIImage(named: "twitter_logo")
+          imageView.contentMode = .scaleAspectFit
+          imageView.translatesAutoresizingMaskIntoConstraints = false
+          return imageView
+      }()
+    
     private let emailField: UITextField = {
         let textField = UITextField()
         textField.borderStyle = .roundedRect
@@ -16,7 +24,6 @@ class LoginController: UIViewController {
         textField.textColor = .white
         textField.translatesAutoresizingMaskIntoConstraints = false
         
-        // Açıq placeholder rəngi
         textField.attributedPlaceholder = NSAttributedString(
             string: "Email Address",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
@@ -33,7 +40,6 @@ class LoginController: UIViewController {
         textField.isSecureTextEntry = true
         textField.translatesAutoresizingMaskIntoConstraints = false
         
-        // Açıq placeholder rəngi
         textField.attributedPlaceholder = NSAttributedString(
             string: "Password",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
@@ -45,7 +51,7 @@ class LoginController: UIViewController {
     private let signInButton: UIButton = {
         let button = UIButton()
         button.setTitle("Sign in", for: .normal)
-        button.backgroundColor = UIColor.systemPink
+        button.backgroundColor = UIColor.systemCyan
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -53,8 +59,8 @@ class LoginController: UIViewController {
     
     private let signUpButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Sign Up", for: .normal)
-        button.backgroundColor = UIColor.systemPink
+        button.setTitle("Sign up", for: .normal)
+        button.backgroundColor = UIColor.systemCyan
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -81,11 +87,14 @@ class LoginController: UIViewController {
         return button
     }
     
+    // MARK: - Properties
     var viewModel = LoginViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupUI()
+        configureViewModel()
     }
     
     func configureViewModel() {
@@ -123,21 +132,22 @@ class LoginController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = UIColor.black
+        view.backgroundColor = UIColor.white
         
+        view.addSubview(logoImageView)
         view.addSubview(emailField)
         view.addSubview(passwordField)
         view.addSubview(signInButton)
         view.addSubview(signUpButton)
         view.addSubview(socialStackView)
         
-        let googleButton = createSocialButton(imageName: "google_icon")
-        let appleButton = createSocialButton(imageName: "apple_icon")
-        let facebookButton = createSocialButton(imageName: "facebook_icon")
-        
-        socialStackView.addArrangedSubview(googleButton)
-        socialStackView.addArrangedSubview(appleButton)
-        socialStackView.addArrangedSubview(facebookButton)
+//        let googleButton = createSocialButton(imageName: "google_icon")
+//        let appleButton = createSocialButton(imageName: "apple_icon")
+//        let facebookButton = createSocialButton(imageName: "facebook_icon")
+//        
+//        socialStackView.addArrangedSubview(googleButton)
+//        socialStackView.addArrangedSubview(appleButton)
+//        socialStackView.addArrangedSubview(facebookButton)
         
         signInButton.addTarget(self, action: #selector(signInTapped), for: .touchUpInside)
         signUpButton.addTarget(self, action: #selector(signUpTapped), for: .touchUpInside)
@@ -147,6 +157,11 @@ class LoginController: UIViewController {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
+            logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 4),
+            logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            logoImageView.widthAnchor.constraint(equalToConstant: 80),
+            logoImageView.heightAnchor.constraint(equalToConstant: 80),
+                        
             emailField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 150),
             emailField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
             emailField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),

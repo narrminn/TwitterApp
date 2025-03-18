@@ -9,14 +9,21 @@ import UIKit
 
 class RegisterController: UIViewController {
     // MARK: - UI Elements
+    private let logoImageView: UIImageView = {
+          let imageView = UIImageView()
+          imageView.image = UIImage(named: "twitter_logo")
+          imageView.contentMode = .scaleAspectFit
+          imageView.translatesAutoresizingMaskIntoConstraints = false
+          return imageView
+      }()
+    
     private let emailField: UITextField = {
         let textField = UITextField()
         textField.borderStyle = .roundedRect
         textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
         textField.textColor = .white
         textField.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Açıq placeholder rəngi
+
         textField.attributedPlaceholder = NSAttributedString(
             string: "Email Address",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
@@ -32,7 +39,6 @@ class RegisterController: UIViewController {
         textField.textColor = .white
         textField.translatesAutoresizingMaskIntoConstraints = false
         
-        // Açıq placeholder rəngi
         textField.attributedPlaceholder = NSAttributedString(
             string: "Your Name",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
@@ -48,7 +54,6 @@ class RegisterController: UIViewController {
         textField.textColor = .white
         textField.translatesAutoresizingMaskIntoConstraints = false
         
-        // Açıq placeholder rəngi
         textField.attributedPlaceholder = NSAttributedString(
             string: "Your username",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
@@ -62,9 +67,9 @@ class RegisterController: UIViewController {
         textField.borderStyle = .roundedRect
         textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
         textField.textColor = .white
+        textField.isSecureTextEntry = true
         textField.translatesAutoresizingMaskIntoConstraints = false
         
-        // Açıq placeholder rəngi
         textField.attributedPlaceholder = NSAttributedString(
             string: "Password",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
@@ -76,7 +81,7 @@ class RegisterController: UIViewController {
     @objc private let signUpButton: UIButton = {
         let button = UIButton()
         button.setTitle("Sign up", for: .normal)
-        button.backgroundColor = UIColor.systemPink
+        button.backgroundColor = UIColor.systemCyan
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -102,17 +107,19 @@ class RegisterController: UIViewController {
         button.widthAnchor.constraint(equalToConstant: 50).isActive = true
         return button
     }
-
+    
+    // MARK: - Properties
     private var viewModel = RegisterViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupUI()
         configureViewModel()
     }
     
     func configureViewModel() {
-        navigationItem.title = "Register"
+        navigationItem.title = "Sign up"
                 
         viewModel.registerSuccess = { userId in
             let coordinator = RegisterApproveCoordinator(userId: userId, navigationController: self.navigationController ?? UINavigationController())
@@ -138,8 +145,9 @@ class RegisterController: UIViewController {
     
     
     private func setupUI() {
-        view.backgroundColor = UIColor.black
+        view.backgroundColor = UIColor.white
         
+        view.addSubview(logoImageView)
         view.addSubview(emailField)
         view.addSubview(nameField)
         view.addSubview(userNameField)
@@ -147,13 +155,13 @@ class RegisterController: UIViewController {
         view.addSubview(signUpButton)
         view.addSubview(socialStackView)
         
-        let googleButton = createSocialButton(imageName: "google_icon")
-        let appleButton = createSocialButton(imageName: "apple_icon")
-        let facebookButton = createSocialButton(imageName: "facebook_icon")
-        
-        socialStackView.addArrangedSubview(googleButton)
-        socialStackView.addArrangedSubview(appleButton)
-        socialStackView.addArrangedSubview(facebookButton)
+//        let googleButton = createSocialButton(imageName: "google_icon")
+//        let appleButton = createSocialButton(imageName: "apple_icon")
+//        let facebookButton = createSocialButton(imageName: "facebook_icon")
+//        
+//        socialStackView.addArrangedSubview(googleButton)
+//        socialStackView.addArrangedSubview(appleButton)
+//        socialStackView.addArrangedSubview(facebookButton)
         
         signUpButton.addTarget(self, action: #selector(signUpTapped), for: .touchUpInside)
         
@@ -162,6 +170,11 @@ class RegisterController: UIViewController {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
+            logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 4),
+            logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            logoImageView.widthAnchor.constraint(equalToConstant: 80),
+            logoImageView.heightAnchor.constraint(equalToConstant: 80),
+            
             emailField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 150),
             emailField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
             emailField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),

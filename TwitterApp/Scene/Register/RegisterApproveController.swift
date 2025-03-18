@@ -16,8 +16,7 @@ class RegisterApproveController: UIViewController {
         textField.textColor = .white
         textField.keyboardType = .numberPad
         textField.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Açıq placeholder rəngi
+
         textField.attributedPlaceholder = NSAttributedString(
             string: "enter code",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
@@ -29,18 +28,19 @@ class RegisterApproveController: UIViewController {
     private let submitButton: UIButton = {
         let button = UIButton()
         button.setTitle("Submit", for: .normal)
-        button.backgroundColor = UIColor.systemPink
+        button.backgroundColor = UIColor.systemCyan
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
+    // MARK: - Properties
     private var viewModel: RegisterApproveViewModel
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupUI()
-        setupConstraints()
         configureViewModel()
     }
     
@@ -52,14 +52,6 @@ class RegisterApproveController: UIViewController {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    @objc func submitTapped() {
-        if let code = codeField.text, !code.isEmpty {
-            viewModel.registerApprove(code: code)
-        } else {
-            self.present(Alert.showAlert(title: "Error", message: "Please enter code"), animated: true)
-        }
     }
     
     private func configureViewModel() {
@@ -74,8 +66,16 @@ class RegisterApproveController: UIViewController {
         }
     }
     
+    @objc func submitTapped() {
+        if let code = codeField.text, !code.isEmpty {
+            viewModel.registerApprove(code: code)
+        } else {
+            self.present(Alert.showAlert(title: "Error", message: "Please enter code"), animated: true)
+        }
+    }
+    
     private func setupUI() {
-        view.backgroundColor = UIColor.black
+        view.backgroundColor = UIColor.white
         
         view.addSubview(codeField)
         view.addSubview(submitButton)
