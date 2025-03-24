@@ -13,6 +13,8 @@ extension CreateTweetController: PHPickerViewControllerDelegate {
         picker.dismiss(animated: true)
         
         selectedImages.removeAll()
+        self.viewModel.tweetFiles = []
+        
         let group = DispatchGroup()
         
         for result in results {
@@ -21,6 +23,9 @@ extension CreateTweetController: PHPickerViewControllerDelegate {
                 defer { group.leave() }
                 if let image = reading as? UIImage {
                     self.selectedImages.append(image)
+                    
+                    //api request
+                    self.viewModel.uploadImage(image: image)
                 }
             }
         }

@@ -21,7 +21,7 @@ class LoginController: UIViewController {
         let textField = UITextField()
         textField.borderStyle = .roundedRect
         textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        textField.textColor = .white
+        textField.textColor = .black
         textField.translatesAutoresizingMaskIntoConstraints = false
         
         textField.attributedPlaceholder = NSAttributedString(
@@ -36,7 +36,7 @@ class LoginController: UIViewController {
         let textField = UITextField()
         textField.borderStyle = .roundedRect
         textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        textField.textColor = .white
+        textField.textColor = .black
         textField.isSecureTextEntry = true
         textField.translatesAutoresizingMaskIntoConstraints = false
         
@@ -106,9 +106,14 @@ class LoginController: UIViewController {
             _ = KeychainManager.shared.save(key: "email", value: loginModel.data?.user?.email ?? "")
             _ = KeychainManager.shared.save(key: "name", value: loginModel.data?.user?.name ?? "")
             _ = KeychainManager.shared.save(key: "username", value: loginModel.data?.user?.username ?? "")
+            _ = KeychainManager.shared.save(key: "profilePhotoPath", value: loginModel.data?.user?.profilePhotoPath ?? "")
 
-            //Coordinator ile Home sehifesine yonlendirecem.
-            print("navigation home")
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let sceneDelegate = windowScene.delegate as? SceneDelegate {
+                
+                let coordinator = AppCoordinator(window: sceneDelegate.window, navigationController: self.navigationController ?? UINavigationController())
+                coordinator.start()
+            }
         }
         
         viewModel.errorHandling = { error in

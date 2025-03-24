@@ -57,13 +57,10 @@ class MainTabController: UITabBarController {
         let notifications = NotificationsController()
         let nav3 = templateNavigationController(image: UIImage(systemName: "bell"), rootViewController: notifications)
         
-        let conversation = ConversationController()
-        let nav4 = templateNavigationController(image: UIImage(systemName: "bubble.left"), rootViewController: conversation)
-        
         let profile = ProfileController()
-        let nav5 = templateNavigationController(image: UIImage(systemName: "person"), rootViewController: profile)
+        let nav4 = templateNavigationController(image: UIImage(systemName: "person"), rootViewController: profile)
         
-        viewControllers = [nav1, nav2, nav3, nav4, nav5]
+        viewControllers = [nav1, nav2, nav3, nav4]
     }
     
     func templateNavigationController(image: UIImage?, rootViewController: UIViewController) -> UINavigationController {

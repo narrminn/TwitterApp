@@ -44,6 +44,11 @@ class CreateTweetController: UIViewController {
         imageView.clipsToBounds = true
         imageView.setDimensions(width: 48, height: 48)
         imageView.image = UIImage(systemName: "person.circle.fill")
+        
+        if let photo = KeychainManager.shared.retrieve(key: "profilePhotoPath") {
+            imageView.loadImage(url: photo)
+        }
+        
         imageView.layer.cornerRadius = 48 / 2
         imageView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -76,6 +81,28 @@ class CreateTweetController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        configureViewModel()
+    }
+    
+    func configureViewModel() {
+        viewModel.fileUploadSuccess = { responseData in
+            let dict = [
+                "file_uuid" : responseData.data?.file?.id,
+                "file_path" : responseData.data?.file?.path
+            ]
+            
+            self.viewModel.tweetFiles.append(dict)
+        }
+        
+        viewModel.tweetStoreSuccess = {
+            self.dismiss(animated: true)
+            
+            //Ana sehife collectionView.reload
+        }
+        
+        viewModel.errorHandling = { error in
+            self.present(Alert.showAlert(title: "Error", message: error), animated: true)
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -84,6 +111,8 @@ class CreateTweetController: UIViewController {
     }
     
     //MARK: - Properties
+    
+    var viewModel = CreateTweetViewModel()
     
     private let captionTextView = CaptionTextView()
     
@@ -98,7 +127,9 @@ class CreateTweetController: UIViewController {
     }
     
     @objc func handleCreateTweet() {
-        
+        if let tweet = captionTextView.text, !tweet.isEmpty {
+            viewModel.tweetStore(description: tweet)
+        }
     }
     
     @objc func handleImagePicker() {

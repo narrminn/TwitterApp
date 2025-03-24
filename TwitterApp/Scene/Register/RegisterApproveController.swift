@@ -13,7 +13,7 @@ class RegisterApproveController: UIViewController {
         let textField = UITextField()
         textField.borderStyle = .roundedRect
         textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        textField.textColor = .white
+        textField.textColor = .black
         textField.keyboardType = .numberPad
         textField.translatesAutoresizingMaskIntoConstraints = false
 

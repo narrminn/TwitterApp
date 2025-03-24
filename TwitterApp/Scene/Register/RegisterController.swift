@@ -21,7 +21,7 @@ class RegisterController: UIViewController {
         let textField = UITextField()
         textField.borderStyle = .roundedRect
         textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        textField.textColor = .white
+        textField.textColor = .black
         textField.translatesAutoresizingMaskIntoConstraints = false
 
         textField.attributedPlaceholder = NSAttributedString(
@@ -36,7 +36,7 @@ class RegisterController: UIViewController {
         let textField = UITextField()
         textField.borderStyle = .roundedRect
         textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        textField.textColor = .white
+        textField.textColor = .black
         textField.translatesAutoresizingMaskIntoConstraints = false
         
         textField.attributedPlaceholder = NSAttributedString(
@@ -51,7 +51,7 @@ class RegisterController: UIViewController {
         let textField = UITextField()
         textField.borderStyle = .roundedRect
         textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        textField.textColor = .white
+        textField.textColor = .black
         textField.translatesAutoresizingMaskIntoConstraints = false
         
         textField.attributedPlaceholder = NSAttributedString(
@@ -66,7 +66,7 @@ class RegisterController: UIViewController {
         let textField = UITextField()
         textField.borderStyle = .roundedRect
         textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        textField.textColor = .white
+        textField.textColor = .black
         textField.isSecureTextEntry = true
         textField.translatesAutoresizingMaskIntoConstraints = false
         
