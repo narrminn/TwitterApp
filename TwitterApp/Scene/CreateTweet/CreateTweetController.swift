@@ -10,7 +10,7 @@ import PhotosUI
 
 class CreateTweetController: UIViewController {
     //MARK: UI Elements
-    
+        
     private lazy var actionButton: UIButton = {
         let button = UIButton(type: .system)
         button.backgroundColor = .twitterBlue
@@ -50,23 +50,14 @@ class CreateTweetController: UIViewController {
         return imageView
     }()
     
-//    let imagePickerButton: UIButton = {
-//        let button = UIButton(type: .system)
-//        button.setImage(UIImage(systemName: "photo"), for: .normal)
-//        button.tintColor = .systemBlue
-//        button.translatesAutoresizingMaskIntoConstraints = false
-//        return button
-//    }()
-    
-    private let imagePickerButton: UIButton = {
+    let imagePickerButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Pick Images", for: .normal)
-        button.setTitleColor(.systemBlue, for: .normal)
+        button.setImage(UIImage(systemName: "photo"), for: .normal)
+        button.tintColor = .systemBlue
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.isUserInteractionEnabled = true
         return button
     }()
-    
+
     lazy var imagesCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -98,6 +89,8 @@ class CreateTweetController: UIViewController {
     
     var selectedImages: [UIImage] = []
     
+    var imagePickerButtonBottomConstraint: NSLayoutConstraint!
+    
     // MARK: - Selectors
     
     @objc func handleCancel() {
@@ -109,10 +102,8 @@ class CreateTweetController: UIViewController {
     }
     
     @objc func handleImagePicker() {
-        print("✅ handleImagePicker called")
-        
         var config = PHPickerConfiguration()
-        config.selectionLimit = 5 // neçə şəkil seçilə bilər
+        config.selectionLimit = 10
         config.filter = .images
 
         let picker = PHPickerViewController(configuration: config)
@@ -124,16 +115,35 @@ class CreateTweetController: UIViewController {
         imagesCollectionView.reloadData()
     }
     
+    @objc func keyboardWillShow(notification: Notification) {
+        if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+            let keyboardHeight = keyboardFrame.height
+            imagePickerButtonBottomConstraint.constant = -keyboardHeight + 28
+            UIView.animate(withDuration: 0.3) {
+                self.view.layoutIfNeeded()
+            }
+        }
+    }
+
+    @objc func keyboardWillHide(notification: Notification) {
+        imagePickerButtonBottomConstraint.constant = -4
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
+        }
+    }
+    
     //MARK: - Helpers
     func configureUI() {
         view.backgroundColor = .white
         
+        view.addSubview(imagePickerButton)
         view.addSubview(actionButton)
         view.addSubview(cancelButton)
         view.addSubview(profileImageView)
         view.addSubview(captionTextView)
-        view.addSubview(imagePickerButton)
         view.addSubview(imagesCollectionView)
+        
+        imagePickerButton.addTarget(self, action: #selector(handleImagePicker), for: .touchUpInside)
         
         configureNavigationBar()
         configureConstraints()
@@ -149,11 +159,16 @@ class CreateTweetController: UIViewController {
         
         actionButton.addTarget(self, action: #selector(handleCreateTweet), for: .touchUpInside)
         cancelButton.addTarget(self, action: #selector(handleCancel), for: .touchUpInside)
-        imagePickerButton.addTarget(self, action: #selector(handleImagePicker), for: .touchUpInside)
     }
     
     func configureConstraints() {
         captionTextView.translatesAutoresizingMaskIntoConstraints = false
+        
+        imagePickerButtonBottomConstraint = imagePickerButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -4)
+        imagePickerButtonBottomConstraint.isActive = true
+
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
 
         NSLayoutConstraint.activate([
             profileImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
@@ -164,20 +179,14 @@ class CreateTweetController: UIViewController {
             captionTextView.topAnchor.constraint(equalTo: profileImageView.topAnchor),
             captionTextView.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 8),
             captionTextView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
-            captionTextView.heightAnchor.constraint(equalToConstant: 200),
-        
-//            imagePickerButton.topAnchor.constraint(equalTo: captionTextView.bottomAnchor, constant: 12),
-//            imagePickerButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
-//            imagePickerButton.widthAnchor.constraint(equalToConstant: 32),
-//            imagePickerButton.heightAnchor.constraint(equalToConstant: 32),
-            
-            imagePickerButton.topAnchor.constraint(equalTo: captionTextView.bottomAnchor, constant: 16),
+            captionTextView.heightAnchor.constraint(equalToConstant: 360),
+
             imagePickerButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
                     
-            imagesCollectionView.topAnchor.constraint(equalTo: captionTextView.bottomAnchor, constant: 12),
             imagesCollectionView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
             imagesCollectionView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
-            imagesCollectionView.heightAnchor.constraint(equalToConstant: 100)
+            imagesCollectionView.bottomAnchor.constraint(equalTo: imagePickerButton.topAnchor, constant: -4),
+            imagesCollectionView.heightAnchor.constraint(equalToConstant: 100),
         ])
     }
 }
@@ -191,28 +200,5 @@ extension CreateTweetController: UICollectionViewDataSource, UICollectionViewDel
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as! ImageCell
         cell.imageView.image = selectedImages[indexPath.item]
         return cell
-    }
-}
-
-extension CreateTweetController: PHPickerViewControllerDelegate {
-    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        picker.dismiss(animated: true)
-        
-        selectedImages.removeAll()
-        let group = DispatchGroup()
-        
-        for result in results {
-            group.enter()
-            result.itemProvider.loadObject(ofClass: UIImage.self) { reading, error in
-                defer { group.leave() }
-                if let image = reading as? UIImage {
-                    self.selectedImages.append(image)
-                }
-            }
-        }
-        
-        group.notify(queue: .main) {
-            self.imagesCollectionView.reloadData()
-        }
     }
 }
