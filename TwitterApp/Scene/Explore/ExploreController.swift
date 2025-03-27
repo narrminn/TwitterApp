@@ -8,6 +8,7 @@
 import UIKit
 
 class ExploreController: UIViewController {
+    //MARK: - UI Elements
 
     override func viewDidLoad() {
         super.viewDidLoad()

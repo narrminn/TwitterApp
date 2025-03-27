@@ -19,7 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         
-        KeychainManager.shared.delete(key: "userId")
+//        KeychainManager.shared.delete(key: "userId")
         let coordinator = AppCoordinator(window: window, navigationController: UINavigationController())
         coordinator.start()
     }

@@ -78,8 +78,21 @@ class CreateTweetController: UIViewController {
         return cv
     }()
 
+    //MARK: - Properties
+    
+    var viewModel = CreateTweetViewModel()
+    
+    private let captionTextView = CaptionTextView()
+    
+    var selectedImages: [UIImage] = []
+    
+    var imagePickerButtonBottomConstraint: NSLayoutConstraint!
+    
+    var homeCollectionReloadAction: (() -> Void)?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         configureUI()
         configureViewModel()
     }
@@ -94,10 +107,12 @@ class CreateTweetController: UIViewController {
             self.viewModel.tweetFiles.append(dict)
         }
         
-        viewModel.tweetStoreSuccess = {
-            self.dismiss(animated: true)
-            
+        viewModel.tweetStoreSuccess = { [weak self] in
+            self?.dismiss(animated: true)
+            self?.tabBarController?.selectedIndex = 0
+            NotificationCenter.default.post(name: NSNotification.Name("tweetCreated"), object: nil)
             //Ana sehife collectionView.reload
+            self?.homeCollectionReloadAction?()
         }
         
         viewModel.errorHandling = { error in
@@ -109,16 +124,6 @@ class CreateTweetController: UIViewController {
         super.viewDidAppear(animated)
         captionTextView.becomeFirstResponder()
     }
-    
-    //MARK: - Properties
-    
-    var viewModel = CreateTweetViewModel()
-    
-    private let captionTextView = CaptionTextView()
-    
-    var selectedImages: [UIImage] = []
-    
-    var imagePickerButtonBottomConstraint: NSLayoutConstraint!
     
     // MARK: - Selectors
     
@@ -164,15 +169,8 @@ class CreateTweetController: UIViewController {
     }
     
     //MARK: - Helpers
-    func configureUI() {
+    fileprivate func configureUI() {
         view.backgroundColor = .white
-        
-        view.addSubview(imagePickerButton)
-        view.addSubview(actionButton)
-        view.addSubview(cancelButton)
-        view.addSubview(profileImageView)
-        view.addSubview(captionTextView)
-        view.addSubview(imagesCollectionView)
         
         imagePickerButton.addTarget(self, action: #selector(handleImagePicker), for: .touchUpInside)
         
@@ -180,7 +178,7 @@ class CreateTweetController: UIViewController {
         configureConstraints()
     }
     
-    func configureNavigationBar() {
+    fileprivate func configureNavigationBar() {
         navigationController?.navigationBar.barTintColor = .white
         navigationController?.navigationBar.backgroundColor = .white
 //        navigationController?.navigationBar.isTranslucent = false
@@ -192,7 +190,14 @@ class CreateTweetController: UIViewController {
         cancelButton.addTarget(self, action: #selector(handleCancel), for: .touchUpInside)
     }
     
-    func configureConstraints() {
+    fileprivate func configureConstraints() {
+        view.addSubview(imagePickerButton)
+        view.addSubview(actionButton)
+        view.addSubview(cancelButton)
+        view.addSubview(profileImageView)
+        view.addSubview(captionTextView)
+        view.addSubview(imagesCollectionView)
+        
         captionTextView.translatesAutoresizingMaskIntoConstraints = false
         
         imagePickerButtonBottomConstraint = imagePickerButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -4)
