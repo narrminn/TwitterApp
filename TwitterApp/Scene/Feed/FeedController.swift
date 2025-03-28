@@ -46,6 +46,7 @@ class FeedController: UIViewController {
         }
     }
     
+    //Sorus
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         NotificationCenter.default.removeObserver(self)
@@ -125,35 +126,36 @@ extension FeedController: UICollectionViewDataSource, UICollectionViewDelegateFl
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        var cellHeight = 110
-        let captionLength = viewModel.tweetAllData[indexPath.row].caption.count
+        let caption = viewModel.tweetAllData[indexPath.row].caption
+        let horizontalPadding: CGFloat = 32
+        let labelWidth = collectionView.frame.width - horizontalPadding
+        let estimatedTextSize = UILabel.estimatedSize(caption, width: labelWidth)
         
-        if captionLength > 35 && captionLength <= 70 {
-            cellHeight = 120
-        }
-        else if captionLength > 70 && captionLength <= 105 {
-            cellHeight = 130
-        }
-        else if captionLength > 105 && captionLength <= 140 {
-            cellHeight = 140
-        }
-        else if captionLength > 140 && captionLength <= 175 {
-            cellHeight = 150
-        }
-        else if captionLength > 175 {
-            cellHeight = 200
-        }
+        var baseHeight: CGFloat = 70
+        baseHeight += estimatedTextSize.height
         
         if let tweetFiles = viewModel.tweetAllData[indexPath.row].tweetFiles,
            tweetFiles.count > 0 {
-            cellHeight += 200
+            baseHeight += 200
         }
-
-        return CGSize(width: collectionView.frame.width, height: CGFloat(cellHeight))
+        
+        return CGSize(width: collectionView.frame.width, height: baseHeight)
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         viewModel.pagination(index: indexPath.row)
     }
 }
+
+extension UILabel {
+    public static func estimatedSize(_ text: String, width: CGFloat) -> CGSize {
+        let label = UILabel(frame: .zero)
+        label.numberOfLines = 0
+        label.font = UIFont.systemFont(ofSize: 16)
+        label.text = text
+        let targetSize = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
+        return label.sizeThatFits(targetSize)
+    }
+}
+
 
