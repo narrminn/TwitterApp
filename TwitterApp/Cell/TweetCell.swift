@@ -17,6 +17,7 @@ protocol TweetCellProtocol {
     var likeCount: Int { get }
     var isLiked: Bool { get }
     var isSavedBookmarked: Bool { get }
+    var tweetFiles: [TweetFile]? { get }
 }
 
 class TweetCell: UICollectionViewCell {
@@ -104,6 +105,26 @@ class TweetCell: UICollectionViewCell {
         return iv
     }()
     
+    lazy var imagesCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.itemSize = CGSize(width: 200, height: 200)
+        layout.minimumInteritemSpacing = 8
+
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.backgroundColor = .clear
+        cv.delegate = self
+        cv.dataSource = self
+        cv.register(ImageCell.self, forCellWithReuseIdentifier: "ImageCell")
+        cv.translatesAutoresizingMaskIntoConstraints = false
+        return cv
+    }()
+    
+    //MARK: - Properties
+    
+    var likeButtonTapAction: (() -> Void)?
+    var bookmarkButtonTapAction: (() -> Void)?
+    
     @objc private func handleCommentTapped() {
         print("Comment Tapped")
     }
@@ -116,15 +137,17 @@ class TweetCell: UICollectionViewCell {
 
         likeImageView.image = UIImage(systemName: imageName)
         likeImageView.tintColor = tintColor
-
+        
         animateReaction(icon: likeImageView, label: likeLabel, increaseBy: isLiked ? 1 : -1)
+        
+        likeButtonTapAction?()
     }
 
     @objc private func handleBookmarkTapped() {
         isBookmarked.toggle()
 
         let imageName = isBookmarked ? "bookmark.fill" : "bookmark"
-        let tintColor: UIColor = isBookmarked ? .systemBlue : .gray
+        let tintColor: UIColor = isBookmarked ? .twitterBlue : .gray
 
         bookmarkImageView.image = UIImage(systemName: imageName)
         bookmarkImageView.tintColor = tintColor
@@ -138,6 +161,8 @@ class TweetCell: UICollectionViewCell {
                                self.bookmarkImageView.transform = .identity
                            }
                        })
+        
+        bookmarkButtonTapAction?()
     }
 
 
@@ -149,7 +174,8 @@ class TweetCell: UICollectionViewCell {
     
     private var isLiked = false
     private var isBookmarked = false
-
+    
+    var tweetFiles : [TweetFile] = []
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -185,9 +211,24 @@ class TweetCell: UICollectionViewCell {
         
 //        collectonView.delegate = self
 //        collectonView.dataSource = self
-//        collectonView.register(ImageCell.self, forCellWithReuseIdentifier: "ImageCell")
-//        
+//        imagesCollectionView.register(ImageCell.self, forCellWithReuseIdentifier: "ImageCell")
+//
         configureConstraints()
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        isLiked = false
+        isBookmarked = false
+        
+        likeImageView.image = UIImage(systemName: "heart")
+        likeImageView.tintColor = .gray
+        
+        bookmarkImageView.image = UIImage(systemName: "bookmark")
+        bookmarkImageView.tintColor = .gray
+        
+        tweetFiles.removeAll()
     }
     
     fileprivate func configureConstraints() {
@@ -208,6 +249,9 @@ class TweetCell: UICollectionViewCell {
         addSubview(captionLabel)
         captionLabel.anchor(top: nameStack.bottomAnchor, left: nameStack.leftAnchor, right: rightAnchor, paddingTop: 4, paddingRight: 2)
         
+        addSubview(imagesCollectionView)
+        imagesCollectionView.anchor(top: captionLabel.bottomAnchor, left: captionLabel.leftAnchor, right: rightAnchor, paddingTop: 4, height: 200)
+        
         let commentStack = UIStackView(arrangedSubviews: [commentImageView, commentLabel])
         commentStack.axis = .horizontal
         commentStack.spacing = 4
@@ -223,8 +267,8 @@ class TweetCell: UICollectionViewCell {
         
         // Like Tap
         let likeTap = UITapGestureRecognizer(target: self, action: #selector(handleLikeTapped))
-        likeStack.isUserInteractionEnabled = true
-        likeStack.addGestureRecognizer(likeTap)
+        likeImageView.isUserInteractionEnabled = true
+        likeImageView.addGestureRecognizer(likeTap)
         
         let bookmarkStack = UIStackView(arrangedSubviews: [bookmarkImageView])
         bookmarkStack.axis = .horizontal
@@ -271,12 +315,38 @@ class TweetCell: UICollectionViewCell {
         commentLabel.text = "\(data.commentCount)"
         likeLabel.text = "\(data.likeCount)"
         
+        tweetFiles = data.tweetFiles ?? []
+        
+        imagesCollectionView.reloadData()
+        
         if data.isLiked {
+            isLiked = true
+
             likeImageView.image = UIImage(systemName: "heart.fill")
+            likeImageView.tintColor = .systemRed
         }
         
         if data.isSavedBookmarked {
+            isBookmarked = true
+            
             bookmarkImageView.image = UIImage(systemName: "bookmark.fill")
+            bookmarkImageView.tintColor = .twitterBlue
         }
+    }
+}
+
+extension TweetCell: UICollectionViewDataSource, UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return tweetFiles.count
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "\(ImageCell.self)", for: indexPath) as! ImageCell
+        
+        if let imagePath = tweetFiles[indexPath.item].filePath {
+            cell.configure(imagePath: imagePath)
+        }
+        
+        return cell
     }
 }

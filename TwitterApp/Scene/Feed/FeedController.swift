@@ -27,6 +27,8 @@ class FeedController: UIViewController {
     
     var viewModel = FeedViewModel()
     
+    var refreshController = UIRefreshControl()
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -40,10 +42,13 @@ class FeedController: UIViewController {
         NotificationCenter.default.addObserver(forName: NSNotification.Name("tweetCreated"),
                                                object: nil,
                                                queue: nil) { [weak self] _ in
-            self?.viewModel.reset()
-            self?.collectionView.reloadData()
-            self?.viewModel.getTweetAll()
+            self?.refreshAction()
         }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - Helpers
@@ -52,11 +57,23 @@ class FeedController: UIViewController {
         
         viewModel.tweetGetSuccess = {
             self.collectionView.reloadData()
+            self.refreshController.endRefreshing()
         }
         
         viewModel.errorHandling = { error in
             self.present(Alert.showAlert(title: "Error", message: error), animated: true)
+            self.refreshController.endRefreshing()
         }
+    }
+    
+    @objc func pullToRefresh() {
+        refreshAction()
+    }
+    
+    func refreshAction() {
+        viewModel.reset()
+        collectionView.reloadData()
+        viewModel.getTweetAll()
     }
     
     func configureUI() {
@@ -71,6 +88,9 @@ class FeedController: UIViewController {
     
     func configureConstraints() {
         view.addSubview(collectionView)
+        
+        refreshController.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
+        collectionView.refreshControl = refreshController
 
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -92,12 +112,48 @@ extension FeedController: UICollectionViewDataSource, UICollectionViewDelegateFl
         
         cell.configure(data: viewModel.tweetAllData[indexPath.row])
         
+        cell.likeButtonTapAction = { [weak self] in
+            self?.viewModel.likeTweet(tweetId: self?.viewModel.tweetAllData[indexPath.row].id ?? 0)
+        }
+        
+        cell.bookmarkButtonTapAction = { [weak self] in
+            self?.viewModel.bookmarkTweet(tweetId: self?.viewModel.tweetAllData[indexPath.row].id ?? 0)
+        }
+        
         return cell
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: 140)
+        var cellHeight = 110
+        let captionLength = viewModel.tweetAllData[indexPath.row].caption.count
+        
+        if captionLength > 35 && captionLength <= 70 {
+            cellHeight = 120
+        }
+        else if captionLength > 70 && captionLength <= 105 {
+            cellHeight = 130
+        }
+        else if captionLength > 105 && captionLength <= 140 {
+            cellHeight = 140
+        }
+        else if captionLength > 140 && captionLength <= 175 {
+            cellHeight = 150
+        }
+        else if captionLength > 175 {
+            cellHeight = 200
+        }
+        
+        if let tweetFiles = viewModel.tweetAllData[indexPath.row].tweetFiles,
+           tweetFiles.count > 0 {
+            cellHeight += 200
+        }
+
+        return CGSize(width: collectionView.frame.width, height: CGFloat(cellHeight))
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        viewModel.pagination(index: indexPath.row)
     }
 }
 

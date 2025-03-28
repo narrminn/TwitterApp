@@ -37,4 +37,26 @@ class FeedViewModel {
         tweetAllResponse = nil
         tweetAllData.removeAll()
     }
+    
+    func pagination(index: Int) {
+        if tweetAllData.count - 2 == index && (tweetAllResponse?.meta?.page ?? 0 < (tweetAllResponse?.meta?.totalPage ?? 0)) {
+            getTweetAll()
+        }
+    }
+    
+    func likeTweet(tweetId: Int) {
+        manager.tweetLike(tweetId: tweetId) { response, errorMessage in
+            if let errorMessage {
+                self.errorHandling?(errorMessage)
+            }
+        }
+    }
+    
+    func bookmarkTweet(tweetId: Int) {
+        manager.tweetBookmark(tweetId: tweetId) { response, errorMessage in
+            if let errorMessage {
+                self.errorHandling?(errorMessage)
+            }
+        }
+    }
 }

@@ -97,6 +97,11 @@ class CreateTweetController: UIViewController {
         configureViewModel()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        captionTextView.becomeFirstResponder()
+    }
+    
     func configureViewModel() {
         viewModel.fileUploadSuccess = { responseData in
             let dict = [
@@ -118,11 +123,6 @@ class CreateTweetController: UIViewController {
         viewModel.errorHandling = { error in
             self.present(Alert.showAlert(title: "Error", message: error), animated: true)
         }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        captionTextView.becomeFirstResponder()
     }
     
     // MARK: - Selectors
@@ -234,7 +234,9 @@ extension CreateTweetController: UICollectionViewDataSource, UICollectionViewDel
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as! ImageCell
-        cell.imageView.image = selectedImages[indexPath.item]
+        
+        cell.configure(image: selectedImages[indexPath.item])
+        
         return cell
     }
 }

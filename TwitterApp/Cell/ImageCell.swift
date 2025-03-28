@@ -39,4 +39,12 @@ class ImageCell: UICollectionViewCell {
             imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
     }
+    
+    func configure(image: UIImage) {
+        imageView.image = image
+    }
+    
+    func configure(imagePath: String) {
+        imageView.loadImage(url: imagePath)
+    }
 }

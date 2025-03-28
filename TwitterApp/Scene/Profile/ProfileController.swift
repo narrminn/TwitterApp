@@ -8,6 +8,7 @@
 import UIKit
 
 class ProfileController: UIViewController {
+    //MARK: - UI Elements
     
     private var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -17,15 +18,32 @@ class ProfileController: UIViewController {
         cv.translatesAutoresizingMaskIntoConstraints = false
         return cv
     }()
-
+    
+    //MARK: - Properties
+    
+    var viewModel = ProfileViewModel()
+    
+    //MARK: - Lifecyle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        configureViewModel()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.isHidden = true
+    }
+    
+    func configureViewModel() {
+        viewModel.profileGetSuccess = {
+            self.collectionView.reloadData()
+        }
+        
+        viewModel.errorHandling = { error in
+            self.present(Alert.showAlert(title: "Error", message: error), animated: true)
+        }
     }
     
     func configureUI() {
@@ -71,6 +89,10 @@ extension ProfileController: UICollectionViewDelegate, UICollectionViewDataSourc
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "\(ProfileHeader.self)", for: indexPath) as! ProfileHeader
+        
+        if let profile = viewModel.profile {
+            header.configure(data: profile)
+        }
         
         return header
     }

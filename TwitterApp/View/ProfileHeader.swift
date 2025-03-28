@@ -7,6 +7,18 @@
 
 import UIKit
 
+protocol ProfileHeaderProtocol {
+    var headerImage: String? { get }
+    var profileImage: String? { get }
+    var fullName: String { get }
+    var username: String { get }
+    var bio: String { get }
+    var link: String { get }
+    var following: Int { get }
+    var follower: Int { get }
+    
+}
+
 class ProfileHeader: UICollectionReusableView {
     
     private lazy var containerView: UIView = {
@@ -19,7 +31,7 @@ class ProfileHeader: UICollectionReusableView {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
-        iv.image = UIImage(named: "header_background")
+        iv.backgroundColor = .twitterBlue
         return iv
     }()
     
@@ -38,7 +50,7 @@ class ProfileHeader: UICollectionReusableView {
         iv.backgroundColor = .lightGray
         iv.layer.borderColor = UIColor.white.cgColor
         iv.layer.borderWidth = 4
-        iv.image = UIImage(named: "profile_image")
+        iv.image = UIImage(systemName: "person.circle.fill")
         return iv
     }()
     
@@ -77,15 +89,12 @@ class ProfileHeader: UICollectionReusableView {
         return label
     }()
     
-    private let linkLabel: UILabel = {
+    private lazy var linkLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 1
         label.textColor = .systemCyan
         label.text = "https://www.google.com"
         label.font = UIFont.systemFont(ofSize: 12)
-        
-        let tap = UITapGestureRecognizer(target: ProfileHeader.self, action: #selector(handleLinkTap))
-        label.addGestureRecognizer(tap)
         
         label.isUserInteractionEnabled = true
         return label
@@ -149,9 +158,9 @@ class ProfileHeader: UICollectionReusableView {
     
     @objc func handleLinkTap() {
         guard let urlString = linkLabel.text,
-                  let url = URL(string: urlString),
-                  UIApplication.shared.canOpenURL(url) else { return }
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+              let url = URL(string: urlString),
+              UIApplication.shared.canOpenURL(url) else { return }
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
     
     @objc func handleFollowingTapped() {
@@ -171,6 +180,9 @@ class ProfileHeader: UICollectionReusableView {
         addSubview(underLine)
         
         filterBar.delegate = self
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleLinkTap))
+        linkLabel.addGestureRecognizer(tapGesture)
         
         let userDetailStack = UIStackView(arrangedSubviews: [fullNameLabel, usernameLabel, bioLabel, linkLabel])
         userDetailStack.axis = .vertical
@@ -205,6 +217,24 @@ class ProfileHeader: UICollectionReusableView {
         filterBar.anchor(left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, height: 50)
         
         underLine.anchor(left: leftAnchor, bottom: bottomAnchor, width: frame.width / 4.5, height: 2)
+    }
+    
+    func configure(data: ProfileHeaderProtocol) {
+        if let headerImage = data.headerImage {
+            headerImageView.loadImage(url: headerImage)
+        }
+        
+        if let profileImage = data.profileImage {
+            profileImageView.loadImage(url: profileImage)
+        }
+        
+        fullNameLabel.text = data.fullName
+        usernameLabel.text = "@\(data.username)"
+        bioLabel.text = data.bio
+        linkLabel.text = data.link
+        followerLabel.text = "\(data.follower) followers"
+        followingLabel.text = "\(data.following) following"
+        
     }
 }
 
