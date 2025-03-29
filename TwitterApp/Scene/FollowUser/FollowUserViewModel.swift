@@ -8,14 +8,40 @@
 import Foundation
 
 class FollowUserViewModel {
-    var tweetManager = TweetManager()
+    var profileManager = ProfileManager()
     
     var userId: Int
+    var followingUser: [FollowUser] = []
+    var followersUser: [FollowUser] = []
     
-    var getLikedUserSuccess: (() -> Void)?
+    var getFollowingUserSuccess: (() -> Void)?
+    var getFollowersUserSuccess: (() -> Void)?
     var errorHandling: ((String) -> Void)?
     
     init (userId: Int) {
         self.userId = userId
     }
+    
+    func getFollowingUser() {
+        profileManager.followingUser(userId: userId) { response, errorMessage in
+            if let errorMessage {
+                self.errorHandling?(errorMessage)
+            } else if let response {
+                self.followingUser = response.data?.users ?? []
+                self.getFollowingUserSuccess?()
+            }
+        }
+    }
+    
+    func getFollowersUser() {
+        profileManager.followersUser(userId: userId) { response, errorMessage in
+            if let errorMessage {
+                self.errorHandling?(errorMessage)
+            } else if let response {
+                self.followersUser = response.data?.users ?? []
+                self.getFollowersUserSuccess?()
+            }
+        }
+    }
 }
+

@@ -34,6 +34,7 @@ class FollowUserController: UIViewController {
     
     private var viewModel: FollowUserViewModel
     
+    var selectedFollowFilterOption: FollowFilterOption = .following
     
     //MARK: - Lifecycle
 
@@ -41,7 +42,7 @@ class FollowUserController: UIViewController {
         super.viewDidLoad()
         
         configureUI()
-//        configureViewModel()
+        configureViewModel()
     }
     
     init(userId: Int) {
@@ -53,16 +54,23 @@ class FollowUserController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-//    fileprivate func configureViewModel() {
-//    
-//        viewModel.getLikedUserSuccess = {
-//            self.tableView.reloadData()
-//        }
-//        
-//        viewModel.errorHandling = { error in
-//            self.present(Alert.showAlert(title: "Error", message: error), animated: true)
-//        }
-//    }
+    fileprivate func configureViewModel() {
+    
+        viewModel.getFollowingUserSuccess = {
+            self.tableView.reloadData()
+        }
+        
+        viewModel.getFollowersUserSuccess = {
+            self.tableView.reloadData()
+        }
+        
+        viewModel.errorHandling = { error in
+            self.present(Alert.showAlert(title: "Error", message: error), animated: true)
+        }
+        
+        viewModel.getFollowingUser()
+        viewModel.getFollowersUser()
+    }
     
     //MARK: - Helpers
     
@@ -94,14 +102,21 @@ class FollowUserController: UIViewController {
 
 extension FollowUserController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        if selectedFollowFilterOption == .following {
+            return viewModel.followingUser.count
+        }
+        return viewModel.followersUser.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "\(ImageNameTableCell.self)") as! ImageNameTableCell
         
-//        cell.configure(data: viewModel.likedUsers[indexPath.row])
-//        
+        if selectedFollowFilterOption == .following {
+            cell.configure(data: viewModel.followingUser[indexPath.row])
+        } else {
+            cell.configure(data: viewModel.followersUser[indexPath.row])
+        }
+        
         return cell
     }
     
@@ -113,6 +128,9 @@ extension FollowUserController: UITableViewDataSource, UITableViewDelegate {
 extension FollowUserController: FollowFilterViewDelegate {
     func filterView(_ view: FollowFilterView, didSelect indexPath: IndexPath) {
         guard let cell = view.collectionView.cellForItem(at: indexPath) as? SegmentFilterCell else { return }
+        
+        selectedFollowFilterOption = FollowFilterOption.allCases[indexPath.row]
+        tableView.reloadData()
         
         let xPosition = cell.frame.origin.x
         UIView.animate(withDuration: 0.3) {

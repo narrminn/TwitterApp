@@ -1,5 +1,5 @@
 //
-//  LikedUserModel.swift
+//  FollowUserModel.swift
 //  TwitterApp
 //
 //  Created by Narmin Alasova on 29.03.25.
@@ -7,22 +7,22 @@
 
 import Foundation
 
-// MARK: - LikedUserModel
-struct LikedUserModel: Codable {
+// MARK: - FollowUserModel
+struct FollowUserModel: Codable {
     let message: String?
-    let data: LikedUserData?
+    let data: FollowUserData?
 }
 
-// MARK: - LikedUserData
-struct LikedUserData: Codable {
-    let users: [LikedUser]?
+// MARK: - FollowUserData
+struct FollowUserData: Codable {
+    let users: [FollowUser]?
 }
 
-// MARK: - LikedUser
-struct LikedUser: Codable, ImageNameTableProtocol {
+// MARK: - FollowUser
+struct FollowUser: Codable, ImageNameTableProtocol {
     
     let id: Int?
-    let name, username: String
+    let name, username : String
     let profilePhotoPath: String?
     
     var profileImage: String? { profilePhotoPath }
@@ -32,6 +32,4 @@ struct LikedUser: Codable, ImageNameTableProtocol {
         case profilePhotoPath = "profile_photo_path"
     }
 }
-
-
 
