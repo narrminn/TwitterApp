@@ -124,6 +124,7 @@ class TweetCell: UICollectionViewCell {
     
     var likeButtonTapAction: (() -> Void)?
     var bookmarkButtonTapAction: (() -> Void)?
+    var likeLabelButtonTapAction: (() -> Void)?
     
     @objc private func handleCommentTapped() {
         print("Comment Tapped")
@@ -168,6 +169,10 @@ class TweetCell: UICollectionViewCell {
 
     @objc private func handleShareTapped() {
         print("Share tapped")
+    }
+    
+    @objc private func handleLikeLabelTapped() {
+        likeLabelButtonTapAction?()
     }
     
     //MARK: - Properties
@@ -269,6 +274,10 @@ class TweetCell: UICollectionViewCell {
         let likeTap = UITapGestureRecognizer(target: self, action: #selector(handleLikeTapped))
         likeImageView.isUserInteractionEnabled = true
         likeImageView.addGestureRecognizer(likeTap)
+        
+        let likeLabelTap = UITapGestureRecognizer(target: self, action: #selector(handleLikeLabelTapped))
+        likeLabel.isUserInteractionEnabled = true
+        likeLabel.addGestureRecognizer(likeLabelTap)
         
         let bookmarkStack = UIStackView(arrangedSubviews: [bookmarkImageView])
         bookmarkStack.axis = .horizontal

@@ -7,11 +7,11 @@
 
 import UIKit
 
-protocol ProfileFilterViewDelegate: AnyObject {
-    func filterView (_ view: ProfileFilterView, didSelect indexPath: IndexPath)
+protocol FollowFilterViewDelegate: AnyObject {
+    func filterView (_ view: FollowFilterView, didSelect indexPath: IndexPath)
 }
 
-class ProfileFilterView: UIView {
+class FollowFilterView: UIView {
     //MARK: - UI Elements
     
     lazy var collectionView: UICollectionView = {
@@ -26,7 +26,7 @@ class ProfileFilterView: UIView {
     
     //MARK: - Properties
     
-    weak var delegate: ProfileFilterViewDelegate?
+    weak var delegate: FollowFilterViewDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -45,15 +45,15 @@ class ProfileFilterView: UIView {
     }
 }
 
-extension ProfileFilterView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension FollowFilterView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        4
+        2
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "\(SegmentFilterCell.self)", for: indexPath) as! SegmentFilterCell
         
-        cell.configure(title: ProfileFilterOption(rawValue: indexPath.row)?.description ?? "")
+        cell.configure(title: FollowFilterOption(rawValue: indexPath.row)?.description ?? "")
         
         return cell
     }
@@ -63,7 +63,7 @@ extension ProfileFilterView: UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: frame.width / 4 - 8, height: frame.height)
+        return CGSize(width: frame.width / 2 - 4, height: frame.height)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {

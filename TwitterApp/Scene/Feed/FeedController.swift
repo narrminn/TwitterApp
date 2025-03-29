@@ -117,6 +117,12 @@ extension FeedController: UICollectionViewDataSource, UICollectionViewDelegateFl
             self?.viewModel.likeTweet(tweetId: self?.viewModel.tweetAllData[indexPath.row].id ?? 0)
         }
         
+        cell.likeLabelButtonTapAction = { [weak self] in
+            let coordinator = LikedUserCoordinator(navigationController: self?.navigationController ?? UINavigationController(), tweetId: self?.viewModel.tweetAllData[indexPath.row].id ?? 0)
+            
+            coordinator.start()
+        }
+        
         cell.bookmarkButtonTapAction = { [weak self] in
             self?.viewModel.bookmarkTweet(tweetId: self?.viewModel.tweetAllData[indexPath.row].id ?? 0)
         }
@@ -131,7 +137,7 @@ extension FeedController: UICollectionViewDataSource, UICollectionViewDelegateFl
         let labelWidth = collectionView.frame.width - horizontalPadding
         let estimatedTextSize = UILabel.estimatedSize(caption, width: labelWidth)
         
-        var baseHeight: CGFloat = 70
+        var baseHeight: CGFloat = 85
         baseHeight += estimatedTextSize.height
         
         if let tweetFiles = viewModel.tweetAllData[indexPath.row].tweetFiles,

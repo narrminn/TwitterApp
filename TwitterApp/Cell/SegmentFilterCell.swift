@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ProfileFilterCell: UICollectionViewCell {
+class SegmentFilterCell: UICollectionViewCell {
     
     let titleLabel: UILabel = {
         let label = UILabel()

@@ -106,9 +106,6 @@ class ProfileHeader: UICollectionReusableView {
         label.text = "200 Following"
         label.font = UIFont.systemFont(ofSize: 12)
         
-        let tap = UITapGestureRecognizer(target: ProfileHeader.self, action: #selector(handleFollowingTapped))
-        label.addGestureRecognizer(tap)
-        
         label.isUserInteractionEnabled = true
         
         return label
@@ -120,9 +117,6 @@ class ProfileHeader: UICollectionReusableView {
         label.textColor = .black
         label.text = "300 Followers"
         label.font = UIFont.systemFont(ofSize: 12)
-        
-        let tap = UITapGestureRecognizer(target: ProfileHeader.self, action: #selector(handleFollowersTapped))
-        label.addGestureRecognizer(tap)
         
         label.isUserInteractionEnabled = true
         
@@ -138,6 +132,8 @@ class ProfileHeader: UICollectionReusableView {
     //MARK: - Properties
     
     private let filterBar = ProfileFilterView()
+    
+    var followButtonTapped: (() -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -163,12 +159,8 @@ class ProfileHeader: UICollectionReusableView {
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
     
-    @objc func handleFollowingTapped() {
-        
-    }
-    
-    @objc func handleFollowersTapped() {
-        print("Followers Tapped")
+    @objc func handleFollowTapped() {
+        followButtonTapped?()
     }
     
     fileprivate func configureConstraints() {
@@ -197,6 +189,9 @@ class ProfileHeader: UICollectionReusableView {
         followStack.distribution = .fillProportionally
         
         addSubview(followStack)
+        
+        let tapGestureFollow = UITapGestureRecognizer(target: self, action: #selector(handleFollowTapped))
+        followStack.addGestureRecognizer(tapGestureFollow)
         
         containerView.anchor(top: topAnchor, left: leftAnchor, right: rightAnchor, height: 108)
         
@@ -240,7 +235,7 @@ class ProfileHeader: UICollectionReusableView {
 
 extension ProfileHeader: ProfileFilterViewDelegate {
     func filterView(_ view: ProfileFilterView, didSelect indexPath: IndexPath) {
-        guard let cell = view.collectionView.cellForItem(at: indexPath) as? ProfileFilterCell else { return }
+        guard let cell = view.collectionView.cellForItem(at: indexPath) as? SegmentFilterCell else { return }
         
         let xPosition = cell.frame.origin.x
         UIView.animate(withDuration: 0.3) {

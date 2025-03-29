@@ -92,6 +92,12 @@ extension ProfileController: UICollectionViewDelegate, UICollectionViewDataSourc
         
         if let profile = viewModel.profile {
             header.configure(data: profile)
+            
+            header.followButtonTapped = { [weak self] in
+                let coordinator = FollowUserCoordinator(navigationController: self?.navigationController ?? UINavigationController() , userId: profile.id ?? 0)
+                
+                coordinator.start()
+            }
         }
         
         return header
