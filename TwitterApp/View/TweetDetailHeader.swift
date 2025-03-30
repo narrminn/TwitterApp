@@ -1,26 +1,13 @@
 //
-//  TweetCell.swift
+//  TweetDetailHeader.swift
 //  TwitterApp
 //
-//  Created by Narmin Alasova on 26.03.25.
+//  Created by Narmin Alasova on 30.03.25.
 //
 
 import UIKit
 
-protocol TweetCellProtocol {
-    var profileImage: String? { get }
-    var fullName: String { get }
-    var username: String { get }
-    var createdAt: String { get }
-    var caption: String { get }
-    var commentCount: Int { get }
-    var likeCount: Int { get }
-    var isLiked: Bool { get }
-    var isSavedBookmarked: Bool { get }
-    var tweetFiles: [TweetFile]? { get }
-}
-
-class TweetCell: UICollectionViewCell {
+class TweetDetailHeader: UICollectionReusableView {
     //MARK: - UI Elements
     
     private let profileImageView: UIImageView = {
@@ -105,6 +92,20 @@ class TweetCell: UICollectionViewCell {
         return iv
     }()
     
+    private let underLineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemGroupedBackground
+        return view
+    }()
+    
+    private let repliesLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Replies"
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textColor = .gray
+        return label
+    }()
+    
     lazy var imagesCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -130,6 +131,10 @@ class TweetCell: UICollectionViewCell {
     private var isBookmarked = false
     
     var tweetFiles : [TweetFile] = []
+    
+    @objc private func handleCommentTapped() {
+        print("Comment Tapped")
+    }
 
     @objc private func handleLikeTapped() {
         isLiked.toggle()
@@ -166,6 +171,7 @@ class TweetCell: UICollectionViewCell {
         
         bookmarkButtonTapAction?()
     }
+
 
     @objc private func handleShareTapped() {
         print("Share tapped")
@@ -250,6 +256,11 @@ class TweetCell: UICollectionViewCell {
         let commentStack = UIStackView(arrangedSubviews: [commentImageView, commentLabel])
         commentStack.axis = .horizontal
         commentStack.spacing = 4
+        
+        // Comment Tap
+        let commentTap = UITapGestureRecognizer(target: self, action: #selector(handleCommentTapped))
+        commentStack.isUserInteractionEnabled = true
+        commentStack.addGestureRecognizer(commentTap)
 
         let likeStack = UIStackView(arrangedSubviews: [likeImageView, likeLabel])
         likeStack.axis = .horizontal
@@ -287,15 +298,17 @@ class TweetCell: UICollectionViewCell {
         bottomStack.distribution = .equalSpacing
         bottomStack.alignment = .center
         
-        addSubview(bottomStack)
-        bottomStack.anchor(left: captionLabel.leftAnchor, bottom: bottomAnchor, right: rightAnchor, paddingBottom: 4, paddingRight: 12, height: 20
-        )
-
-    
-        let underLineView = UIView()
-        underLineView.backgroundColor = .systemGroupedBackground
+        addSubview(repliesLabel)
+        repliesLabel.anchor(left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, paddingLeft: 12)
+        
         addSubview(underLineView)
-        underLineView.anchor(left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, height: 1)
+        underLineView.anchor(left: leftAnchor, bottom: repliesLabel.topAnchor, right: rightAnchor, paddingBottom: 4, height: 1)
+        
+        addSubview(bottomStack)
+        bottomStack.anchor(left: captionLabel.leftAnchor, bottom: underLineView.topAnchor, right: rightAnchor, paddingBottom: 4, paddingRight: 12, height: 20
+        )
+        
+        
     }
     
     func configure(data: TweetCellProtocol) {
@@ -327,9 +340,10 @@ class TweetCell: UICollectionViewCell {
             bookmarkImageView.tintColor = .twitterBlue
         }
     }
+        
 }
 
-extension TweetCell: UICollectionViewDataSource, UICollectionViewDelegate {
+extension TweetDetailHeader: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return tweetFiles.count
     }

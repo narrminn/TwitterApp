@@ -26,6 +26,7 @@ class FeedController: UIViewController {
     //MARK: - Properties
     
     var viewModel = FeedViewModel()
+    var baseViewModel = TweetBaseViewModel()
     
     var refreshController = UIRefreshControl()
     
@@ -62,6 +63,11 @@ class FeedController: UIViewController {
         }
         
         viewModel.errorHandling = { error in
+            self.present(Alert.showAlert(title: "Error", message: error), animated: true)
+            self.refreshController.endRefreshing()
+        }
+        
+        baseViewModel.errorHandling = { error in
             self.present(Alert.showAlert(title: "Error", message: error), animated: true)
             self.refreshController.endRefreshing()
         }
@@ -114,7 +120,7 @@ extension FeedController: UICollectionViewDataSource, UICollectionViewDelegateFl
         cell.configure(data: viewModel.tweetAllData[indexPath.row])
         
         cell.likeButtonTapAction = { [weak self] in
-            self?.viewModel.likeTweet(tweetId: self?.viewModel.tweetAllData[indexPath.row].id ?? 0)
+            self?.baseViewModel.likeTweet(tweetId: self?.viewModel.tweetAllData[indexPath.row].id ?? 0)
         }
         
         cell.likeLabelButtonTapAction = { [weak self] in
@@ -124,7 +130,7 @@ extension FeedController: UICollectionViewDataSource, UICollectionViewDelegateFl
         }
         
         cell.bookmarkButtonTapAction = { [weak self] in
-            self?.viewModel.bookmarkTweet(tweetId: self?.viewModel.tweetAllData[indexPath.row].id ?? 0)
+            self?.baseViewModel.bookmarkTweet(tweetId: self?.viewModel.tweetAllData[indexPath.row].id ?? 0)
         }
         
         return cell
@@ -146,6 +152,11 @@ extension FeedController: UICollectionViewDataSource, UICollectionViewDelegateFl
         }
         
         return CGSize(width: collectionView.frame.width, height: baseHeight)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let coordinator = TweetDetailCoordinator(navigationController: navigationController ?? UINavigationController(), tweetId: viewModel.tweetAllData[indexPath.row].id ?? 0)
+        coordinator.start()
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {

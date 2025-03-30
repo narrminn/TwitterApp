@@ -10,7 +10,7 @@ import UIKit
 class MainTabController: UITabBarController {
     //MARK: - UI Elements
     
-    let actionButton: UIButton = {
+    let createTweetButton: UIButton = {
         let button = UIButton(type: .system)
         button.tintColor = .white
         button.backgroundColor = .twitterBlue
@@ -27,23 +27,28 @@ class MainTabController: UITabBarController {
     }
     
     // MARK: - Selectors
-    @objc func actionButtonTapped() {
+    
+    @objc func createTweetButtonTapped() {
         if let navController = selectedViewController as? UINavigationController {
             let coordinator = CreateTweetCoordinator(navigationController: navController, viewController: self.selectedViewController)
             coordinator.start()
         }
     }
     
+    func setCreateTweetButton(hidden: Bool) {
+        createTweetButton.isHidden = hidden
+    }
+    
     func configureUI() {
-        view.addSubview(actionButton)
-        actionButton.addTarget(self, action: #selector(actionButtonTapped), for: .touchUpInside)
+        view.addSubview(createTweetButton)
+        createTweetButton.addTarget(self, action: #selector(createTweetButtonTapped), for: .touchUpInside)
         configureConstraints()
     }
     
     func configureConstraints() {
-        actionButton.anchor(bottom: view.safeAreaLayoutGuide.bottomAnchor, right: view.rightAnchor, paddingBottom: 64, paddingRight: 16,
+        createTweetButton.anchor(bottom: view.safeAreaLayoutGuide.bottomAnchor, right: view.rightAnchor, paddingBottom: 64, paddingRight: 16,
                             width: 56, height: 56)
-        actionButton.layer.cornerRadius = 56 / 2
+        createTweetButton.layer.cornerRadius = 56 / 2
     }
     
     func configureViewControllers() {

@@ -43,20 +43,4 @@ class FeedViewModel {
             getTweetAll()
         }
     }
-    
-    func likeTweet(tweetId: Int) {
-        manager.tweetLike(tweetId: tweetId) { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            }
-        }
-    }
-    
-    func bookmarkTweet(tweetId: Int) {
-        manager.tweetBookmark(tweetId: tweetId) { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            }
-        }
-    }
 }

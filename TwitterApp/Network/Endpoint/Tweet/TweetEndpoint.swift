@@ -13,6 +13,9 @@ enum TweetEndpoint {
     case tweetLike(tweetId: Int)
     case tweetBookmark(tweetId: Int)
     case tweetLikedUser(tweetId: Int)
+    case tweetDetail(tweetId: Int)
+    case tweetComment(tweetId: Int)
+    case tweetCommentStore(tweetId: Int)
     
     var path: String {
         switch self {
@@ -24,8 +27,14 @@ enum TweetEndpoint {
                 return NetworkHelper.shared.configureURL(endpoint: "tweet/like/\(tweetId)")
             case .tweetBookmark(let tweetId):
                 return NetworkHelper.shared.configureURL(endpoint: "tweet/save/\(tweetId)")
-        case .tweetLikedUser(let tweetId):
+            case .tweetLikedUser(let tweetId):
                 return NetworkHelper.shared.configureURL(endpoint: "tweet/like/\(tweetId)/user-list")
+            case .tweetDetail(let tweetId):
+                return NetworkHelper.shared.configureURL(endpoint: "tweet/show/\(tweetId)")
+            case .tweetComment(tweetId: let tweetId):
+                return NetworkHelper.shared.configureURL(endpoint: "tweet/comments/all/\(tweetId)")
+            case.tweetCommentStore(let tweetId):
+                return NetworkHelper.shared.configureURL(endpoint: "tweet/comments/save/\(tweetId)")
         }
     }
 }
