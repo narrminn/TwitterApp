@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ProfileController: UIViewController {
+class OtherProfileController: UIViewController {
     //MARK: - UI Elements
     
     private var collectionView: UICollectionView = {
@@ -21,7 +21,7 @@ class ProfileController: UIViewController {
     
     //MARK: - Properties
     
-    var viewModel = ProfileViewModel()
+    var viewModel: OtherProfileViewModel
     var baseViewModel = TweetBaseViewModel()
     var selectedFilterbar = ProfileFilterOption.tweets
     
@@ -38,6 +38,15 @@ class ProfileController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.isHidden = true
+    }
+    
+    init(userId: Int) {
+        self.viewModel = OtherProfileViewModel(userId: userId)
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     func configureViewModel() {
@@ -66,6 +75,10 @@ class ProfileController: UIViewController {
             self.refreshController.endRefreshing()
         }
         
+        viewModel.followProfileSuccess = {
+            
+        }
+        
         viewModel.errorHandling = { error in
             self.present(Alert.showAlert(title: "Error", message: error), animated: true)
             self.refreshController.endRefreshing()
@@ -83,7 +96,7 @@ class ProfileController: UIViewController {
         viewModel.resetAllLiked()
         viewModel.resetAllSaved()
         
-        viewModel.getMyProfile()
+        viewModel.getOtherProfile()
     }
     
     func configureUI() {
@@ -116,7 +129,7 @@ class ProfileController: UIViewController {
     }
 }
 
-extension ProfileController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension OtherProfileController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if selectedFilterbar == .tweets {
             return viewModel.tweetAllOwnData.count
@@ -241,12 +254,16 @@ extension ProfileController: UICollectionViewDelegate, UICollectionViewDataSourc
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "\(ProfileHeader.self)", for: indexPath) as! ProfileHeader
         
         if let profile = viewModel.profile {
-            header.configure(data: profile, isMyProfile: true)
+            header.configure(data: profile, isMyProfile: false)
             
             header.followListButtonTapped = { [weak self] in
                 let coordinator = FollowUserCoordinator(navigationController: self?.navigationController ?? UINavigationController() , userId: profile.id ?? 0)
                 
                 coordinator.start()
+            }
+            
+            header.followButtonTapped = { [weak self] in
+                self?.viewModel.followProfile()
             }
         }
         

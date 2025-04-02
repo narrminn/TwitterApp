@@ -8,23 +8,24 @@
 import Foundation
 
 // MARK: - MyProfileModel
-struct MyProfileModel: Codable {
+struct ProfileModel: Codable {
     let message: String?
-    let data: MyProfileModelData?
+    let data: ProfileModelData?
 }
 
 // MARK: - MyProfileModelData
-struct MyProfileModelData: Codable {
-    let user: MyProfileModelUser?
+struct ProfileModelData: Codable {
+    let user: ProfileModelUser?
 }
 
 // MARK: - MyProfileModelUser
-struct MyProfileModelUser: Codable, ProfileHeaderProtocol {
+struct ProfileModelUser: Codable, ProfileHeaderProtocol {
     let id: Int?
     let name, username, email, bio: String
     let link: String
     let profilePhotoPath, profilePhotoUUID, profileBannerPath, profileBannerUUID: String?
     let followersCount, followingCount: Int?
+    let isFollowing: Bool?
     
     var headerImage: String? { profileBannerPath }
     
@@ -48,6 +49,7 @@ struct MyProfileModelUser: Codable, ProfileHeaderProtocol {
         case profileBannerUUID = "profile_banner_uuid"
         case followersCount = "followers_count"
         case followingCount = "following_count"
+        case isFollowing = "is_following"
     }
 }
 

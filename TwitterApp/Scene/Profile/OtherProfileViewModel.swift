@@ -7,14 +7,17 @@
 
 import Foundation
 
-class ProfileViewModel {
+class OtherProfileViewModel {
     var manager = ProfileManager()
     var tweetManager = TweetManager()
     
     var profile: ProfileModelUser?
+    var userId: Int
     
     var profileGetSuccess: (() -> Void)?
     var errorHandling: ((String) -> Void)?
+    
+    var followProfileSuccess: (() -> Void)?
     
     var getTweetAllOwnSuccess: (() -> Void)?
     var getTweetAllRepliesSuccess: (() -> Void)?
@@ -31,12 +34,13 @@ class ProfileViewModel {
     var tweetAllLikedData = [TweetAll]()
     var tweetAllSavedData = [TweetAll]()
     
-    init() {
-        getMyProfile()
+    init(userId: Int) {
+        self.userId = userId
+        getOtherProfile()
     }
     
-    func getMyProfile() -> Void {
-        manager.myProfile { response, errorMessage in
+    func getOtherProfile() {
+        manager.otherProfile(userId: userId){ response, errorMessage in
             if let errorMessage {
                 self.errorHandling?(errorMessage)
             } else if let response {
@@ -145,6 +149,16 @@ class ProfileViewModel {
     func paginationAllSaved(index: Int) {
         if tweetAllSavedData.count - 2 == index && (tweetAllSavedResponse?.meta?.page ?? 0 < (tweetAllSavedResponse?.meta?.totalPage ?? 0)) {
             getTweetAllSaved()
+        }
+    }
+    
+    func followProfile() {
+        manager.followProfile(userId: userId) { response, errorMessage in
+            if let errorMessage {
+                self.errorHandling?(errorMessage)
+            } else if let response {
+                self.followProfileSuccess?()
+            }
         }
     }
 }

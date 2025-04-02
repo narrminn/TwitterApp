@@ -8,7 +8,9 @@
 import UIKit
 
 protocol TweetCellProtocol {
+    var id: Int? { get }
     var profileImage: String? { get }
+    var createdBy: Int? { get }
     var fullName: String { get }
     var username: String { get }
     var createdAt: String { get }
@@ -125,6 +127,7 @@ class TweetCell: UICollectionViewCell {
     var likeButtonTapAction: (() -> Void)?
     var bookmarkButtonTapAction: (() -> Void)?
     var likeLabelButtonTapAction: (() -> Void)?
+    var profileButtonTapAction: (() -> Void)?
     
     private var isLiked = false
     private var isBookmarked = false
@@ -173,6 +176,10 @@ class TweetCell: UICollectionViewCell {
     
     @objc private func handleLikeLabelTapped() {
         likeLabelButtonTapAction?()
+    }
+    
+    @objc private func handleProfileTapped() {
+        profileButtonTapAction?()
     }
     
     
@@ -254,6 +261,11 @@ class TweetCell: UICollectionViewCell {
         let likeStack = UIStackView(arrangedSubviews: [likeImageView, likeLabel])
         likeStack.axis = .horizontal
         likeStack.spacing = 4
+        
+        // Like Tap
+        let profileTap = UITapGestureRecognizer(target: self, action: #selector(handleProfileTapped))
+        profileImageView.isUserInteractionEnabled = true
+        profileImageView.addGestureRecognizer(profileTap)
         
         // Like Tap
         let likeTap = UITapGestureRecognizer(target: self, action: #selector(handleLikeTapped))

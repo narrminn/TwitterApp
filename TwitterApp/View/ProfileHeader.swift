@@ -16,6 +16,7 @@ protocol ProfileHeaderProtocol {
     var link: String { get }
     var following: Int { get }
     var follower: Int { get }
+    var isFollowing: Bool? { get }
     
 }
 
@@ -56,7 +57,7 @@ class ProfileHeader: UICollectionReusableView {
     
     private lazy var editProfileFollowButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Edit Profile", for: .normal)
+        //button.setTitle("Edit Profile", for: .normal)
         button.layer.borderColor = UIColor.twitterBlue.cgColor
         button.layer.borderWidth = 1.25
         button.setTitleColor(.twitterBlue, for: .normal)
@@ -132,8 +133,12 @@ class ProfileHeader: UICollectionReusableView {
     //MARK: - Properties
     
     private let filterBar = ProfileFilterView()
+    var selectedFilterbarIndex = 0
     
+    var followListButtonTapped: (() -> Void)?
     var followButtonTapped: (() -> Void)?
+    var selectedProfileChangedAction: ((ProfileFilterOption) -> Void)?
+    var isMyProfile = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -144,12 +149,32 @@ class ProfileHeader: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        let defaultIndexPath = IndexPath(row: selectedFilterbarIndex, section: 0)
+        guard let cell = filterBar.collectionView.cellForItem(at: defaultIndexPath) as? SegmentFilterCell else {
+            return
+        }
+
+        underLine.frame.origin.x = cell.frame.origin.x
+        underLine.frame.size.width = cell.frame.width
+    }
+    
     @objc func handleDissmissal() {
         print("Dismissal")
     }
     
     @objc func handleEditProfileFollow() {
-        print("Edit Profile/Follow")
+        if !isMyProfile { // Follow Button Tapped
+            followButtonTapped?()
+            
+            var title = editProfileFollowButton.titleLabel?.text == "Follow" ? "Unfollow" : "Follow"
+            
+            editProfileFollowButton.setTitle(title, for: .normal)
+        } else { // Edit Button Tapped
+            
+        }
     }
     
     @objc func handleLinkTap() {
@@ -160,7 +185,7 @@ class ProfileHeader: UICollectionReusableView {
     }
     
     @objc func handleFollowTapped() {
-        followButtonTapped?()
+        followListButtonTapped?()
     }
     
     fileprivate func configureConstraints() {
@@ -214,7 +239,7 @@ class ProfileHeader: UICollectionReusableView {
         underLine.anchor(left: leftAnchor, bottom: bottomAnchor, width: frame.width / 4.5, height: 2)
     }
     
-    func configure(data: ProfileHeaderProtocol) {
+    func configure(data: ProfileHeaderProtocol, isMyProfile: Bool) {
         if let headerImage = data.headerImage {
             headerImageView.loadImage(url: headerImage)
         }
@@ -230,12 +255,30 @@ class ProfileHeader: UICollectionReusableView {
         followerLabel.text = "\(data.follower) followers"
         followingLabel.text = "\(data.following) following"
         
+        self.isMyProfile = isMyProfile
+        
+        if isMyProfile {
+            editProfileFollowButton.setTitle("Edit profile", for: .normal)
+        }
+        else {
+            var title = "Follow"
+            if let isFollowing = data.isFollowing, isFollowing == true {
+                title = "Unfollow"
+            }
+            
+            editProfileFollowButton.setTitle(title, for: .normal)
+        }
     }
 }
 
 extension ProfileHeader: ProfileFilterViewDelegate {
     func filterView(_ view: ProfileFilterView, didSelect indexPath: IndexPath) {
         guard let cell = view.collectionView.cellForItem(at: indexPath) as? SegmentFilterCell else { return }
+        
+        let selectedFilter = ProfileFilterOption.allCases[indexPath.row]
+        
+        selectedProfileChangedAction?(selectedFilter)
+        selectedFilterbarIndex = indexPath.row
         
         let xPosition = cell.frame.origin.x
         UIView.animate(withDuration: 0.3) {

@@ -133,6 +133,12 @@ extension FeedController: UICollectionViewDataSource, UICollectionViewDelegateFl
             self?.baseViewModel.bookmarkTweet(tweetId: self?.viewModel.tweetAllData[indexPath.row].id ?? 0)
         }
         
+        cell.profileButtonTapAction = { [weak self] in
+            let coordinator = OtherProfileCoordinator(navigationController: self?.navigationController ?? UINavigationController(), userId: self?.viewModel.tweetAllData[indexPath.row].createdBy ?? 0)
+            
+            coordinator.start()
+        }
+        
         return cell
     }
 
