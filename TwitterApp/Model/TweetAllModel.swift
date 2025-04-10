@@ -11,7 +11,7 @@ import Foundation
 struct TweetAllModel: Codable {
     let message: String?
     let data: TweetAllModelData?
-    let meta: TweetAllMeta?
+    let meta: Meta?
 }
 
 // MARK: - TweetAllModelData
@@ -78,7 +78,7 @@ struct TweetFile: Codable {
 }
 
 // MARK: - TweetAllMeta
-struct TweetAllMeta: Codable {
+struct Meta: Codable {
     let total: Int?
     let page: Int?
     let limit, totalPage: Int?

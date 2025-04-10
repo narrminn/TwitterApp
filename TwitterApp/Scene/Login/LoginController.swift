@@ -66,27 +66,6 @@ class LoginController: UIViewController {
         return button
     }()
     
-    private let socialStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 16
-        stackView.distribution = .equalSpacing
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-    
-    private func createSocialButton(imageName: String) -> UIButton {
-        let button = UIButton()
-        button.setImage(UIImage(named: imageName), for: .normal)
-        button.layer.cornerRadius = 25
-        button.clipsToBounds = true
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        button.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        button.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        return button
-    }
-    
     // MARK: - Properties
     var viewModel = LoginViewModel()
     
@@ -101,31 +80,58 @@ class LoginController: UIViewController {
         navigationItem.title = "Login"
                 
         viewModel.loginSuccess = { loginModel in
-            _ = KeychainManager.shared.save(key: "token", value: loginModel.data?.token ?? "")
-            _ = KeychainManager.shared.save(key: "userId", value: String(loginModel.data?.user?.id ?? 0))
-            _ = KeychainManager.shared.save(key: "email", value: loginModel.data?.user?.email ?? "")
-            _ = KeychainManager.shared.save(key: "name", value: loginModel.data?.user?.name ?? "")
-            _ = KeychainManager.shared.save(key: "username", value: loginModel.data?.user?.username ?? "")
-            _ = KeychainManager.shared.save(key: "profilePhotoPath", value: loginModel.data?.user?.profilePhotoPath ?? "")
-
-            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let sceneDelegate = windowScene.delegate as? SceneDelegate {
-                
-                let coordinator = AppCoordinator(window: sceneDelegate.window, navigationController: self.navigationController ?? UINavigationController())
-                coordinator.start()
-            }
+            self.loginSuccess(loginModel: loginModel)
         }
         
         viewModel.errorHandling = { error in
             self.present(Alert.showAlert(title: "Error", message: "Email or password is wrong. Please try again"), animated: true)
+        }
+        
+        bindViewModel()
+    }
+    
+    func loginSuccess(loginModel: LoginModel) {
+        _ = KeychainManager.shared.save(key: "token", value: loginModel.data?.token ?? "")
+        _ = KeychainManager.shared.save(key: "userId", value: String(loginModel.data?.user?.id ?? 0))
+        _ = KeychainManager.shared.save(key: "email", value: loginModel.data?.user?.email ?? "")
+        _ = KeychainManager.shared.save(key: "name", value: loginModel.data?.user?.name ?? "")
+        _ = KeychainManager.shared.save(key: "username", value: loginModel.data?.user?.username ?? "")
+        _ = KeychainManager.shared.save(key: "profilePhotoPath", value: loginModel.data?.user?.profilePhotoPath ?? "")
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let sceneDelegate = windowScene.delegate as? SceneDelegate {
+            
+            let coordinator = AppCoordinator(window: sceneDelegate.window, navigationController: self.navigationController ?? UINavigationController())
+            coordinator.start()
+        }
+    }
+    
+    func bindViewModel() {
+        Task { @MainActor in
+            viewModel.stateUpdated = { [weak self] state in
+                switch state {
+                case .loginSuccess(let loginModel):
+                    self?.loginSuccess(loginModel: loginModel)
+                case .loading:
+                    break
+                case .loaded:
+                    break
+                case .errorHandling(_):
+                    self?.present(Alert.showAlert(title: "Error", message: "Email or password is wrong. Please try again"), animated: true)
+                case .idle:
+                    break;
+                }
+            }
         }
     }
 
     @objc func signInTapped() {
         if let email = emailField.text, let password = passwordField.text, !email.isEmpty, !password.isEmpty {
             
-            viewModel.login(email: email, password: password)
-            
+//            viewModel.login(email: email, password: password)
+        Task { @MainActor in
+                await viewModel.loginAsync(email: email, password: password)
+            }
         } else {
             self.present(Alert.showAlert(title: "Error", message: "Please fill all inputs"), animated: true)
         }
@@ -144,15 +150,6 @@ class LoginController: UIViewController {
         view.addSubview(passwordField)
         view.addSubview(signInButton)
         view.addSubview(signUpButton)
-        view.addSubview(socialStackView)
-        
-//        let googleButton = createSocialButton(imageName: "google_icon")
-//        let appleButton = createSocialButton(imageName: "apple_icon")
-//        let facebookButton = createSocialButton(imageName: "facebook_icon")
-//        
-//        socialStackView.addArrangedSubview(googleButton)
-//        socialStackView.addArrangedSubview(appleButton)
-//        socialStackView.addArrangedSubview(facebookButton)
         
         signInButton.addTarget(self, action: #selector(signInTapped), for: .touchUpInside)
         signUpButton.addTarget(self, action: #selector(signUpTapped), for: .touchUpInside)
@@ -183,11 +180,7 @@ class LoginController: UIViewController {
             signUpButton.topAnchor.constraint(equalTo: signInButton.bottomAnchor, constant: 20),
             signUpButton.leadingAnchor.constraint(equalTo: emailField.leadingAnchor),
             signUpButton.trailingAnchor.constraint(equalTo: emailField.trailingAnchor),
-            signUpButton.heightAnchor.constraint(equalToConstant: 40),
-            
-            socialStackView.topAnchor.constraint(equalTo: signUpButton.bottomAnchor, constant: 40),
-            socialStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            socialStackView.heightAnchor.constraint(equalToConstant: 50)
+            signUpButton.heightAnchor.constraint(equalToConstant: 40)
         ])
     }
 }

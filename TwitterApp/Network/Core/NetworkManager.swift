@@ -40,6 +40,44 @@ class NetworkManager {
         }
     }
     
+    func request<T: Codable>(path: String,
+                             model: T.Type,
+                             method: HTTPMethod = .get,
+                             params: Parameters? = nil,
+                             encodingType: EncodingType = .url,
+                             header: [String: String]? = nil) async throws -> T {
+        var headers: HTTPHeaders?
+        
+        if let paramHeader = header {
+            headers = HTTPHeaders(paramHeader)
+        }
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            AF.request(path,
+                       method: method,
+                       parameters: params,
+                       encoding: encodingType == .url ? URLEncoding.default : JSONEncoding.default,
+                       headers: headers).responseDecodable(of: model.self) { response in
+                let statusCode = response.response?.statusCode ?? 0
+                
+                if (statusCode >= 200 && statusCode < 300) {
+                    switch response.result {
+                    case .success(let data):
+                        continuation.resume(returning: data)
+                    case .failure(let error):
+                        continuation.resume(throwing: NSError(domain: error.localizedDescription, code: statusCode, userInfo: nil))
+                    }
+                }
+                else if (statusCode == 500) {
+                    continuation.resume(throwing: NSError(domain: "Server error", code: statusCode, userInfo: nil))
+                }
+                else {
+                    continuation.resume(throwing: NSError(domain: "Bad request", code: statusCode, userInfo: nil))
+                }
+            }
+        }
+    }
+    
     func uploadPhoto<T: Codable>(path: String,
                                      model: T.Type,
                                      method: HTTPMethod = .post,

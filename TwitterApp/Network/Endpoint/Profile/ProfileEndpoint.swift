@@ -13,6 +13,7 @@ enum ProfileEndpoint {
     case followersUser(userId: Int)
     case otherProfile(userId: Int)
     case followProfile(userId: Int)
+    case searchProfile
 
     var path: String {
         switch self {
@@ -26,6 +27,8 @@ enum ProfileEndpoint {
                 return NetworkHelper.shared.configureURL(endpoint: "profile/other/\(userId)")
             case .followProfile(let userId):
                 return NetworkHelper.shared.configureURL(endpoint: "follow/\(userId)")
+            case .searchProfile:
+                return NetworkHelper.shared.configureURL(endpoint: "profile/search")
         }
     }
 }

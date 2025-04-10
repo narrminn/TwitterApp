@@ -19,7 +19,6 @@ class ProfileCoordinator : Coordinator {
     
     func start() {
         let controller = OtherProfileController(userId: userId)
-        
-        self.navigationController.show(controller, sender: nil)
+        navigationController.show(controller, sender: nil)
     }
 }
