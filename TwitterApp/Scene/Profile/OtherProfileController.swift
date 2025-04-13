@@ -33,6 +33,8 @@ class OtherProfileController: UIViewController {
         super.viewDidLoad()
         configureUI()
         configureViewModel()
+        
+        getOtherProfile()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -96,7 +98,13 @@ class OtherProfileController: UIViewController {
         viewModel.resetAllLiked()
         viewModel.resetAllSaved()
         
-        viewModel.getOtherProfile()
+        getOtherProfile()
+    }
+    
+    func getOtherProfile() {
+        Task { @MainActor in
+            await viewModel.getOtherProfile()
+        }
     }
     
     func configureUI() {
@@ -239,14 +247,16 @@ extension OtherProfileController: UICollectionViewDelegate, UICollectionViewData
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        if selectedFilterbar == .tweets {
-            viewModel.paginationAllOwn(index: indexPath.row)
-        } else if selectedFilterbar == .replies {
-            viewModel.paginationAllReplies(index: indexPath.row)
-        } else if selectedFilterbar == .likes {
-            viewModel.paginationAllLiked(index: indexPath.row)
-        } else if selectedFilterbar == .savedTweets {
-            viewModel.paginationAllSaved(index: indexPath.row)
+        Task { @MainActor in
+            if selectedFilterbar == .tweets {
+                await viewModel.paginationAllOwn(index: indexPath.row)
+            } else if selectedFilterbar == .replies {
+                await viewModel.paginationAllReplies(index: indexPath.row)
+            } else if selectedFilterbar == .likes {
+                await viewModel.paginationAllLiked(index: indexPath.row)
+            } else if selectedFilterbar == .savedTweets {
+                await viewModel.paginationAllSaved(index: indexPath.row)
+            }
         }
     }
     
@@ -263,7 +273,9 @@ extension OtherProfileController: UICollectionViewDelegate, UICollectionViewData
             }
             
             header.followButtonTapped = { [weak self] in
-                self?.viewModel.followProfile()
+                Task { @MainActor in
+                    await self?.viewModel.followProfile()
+                }
             }
         }
         

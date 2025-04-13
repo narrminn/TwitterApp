@@ -10,10 +10,11 @@ protocol TweetManagerUseCase {
     func tweetComment(tweetId: Int, completion: @escaping((CommentModel?, String?) -> Void))
     func tweetCommentStore(comment: String, tweetId: Int, completion: @escaping((CommentModel?, String?) -> Void))
     
-    func tweetAllOwn(page: Int, userId: Int, completion: @escaping((TweetAllModel?, String?) -> Void))
-    func tweetAllReplies(page: Int, userId: Int, completion: @escaping((TweetAllModel?, String?) -> Void))
-    func tweetAllLiked(page: Int, userId: Int, completion: @escaping((TweetAllModel?, String?) -> Void))
-    func tweetAllSaved(page: Int, userId: Int, completion: @escaping((TweetAllModel?, String?) -> Void))
+    //async await tweetAllOwn, tweetAllReplies, tweetAllLiked, tweetSaved.
+    func tweetAllOwn(page: Int, userId: Int) async throws -> TweetAllModel?
+    func tweetAllReplies(page: Int, userId: Int) async throws -> TweetAllModel?
+    func tweetAllLiked(page: Int, userId: Int) async throws -> TweetAllModel?
+    func tweetAllSaved(page: Int, userId: Int) async throws -> TweetAllModel?
 }
 
 class TweetManager: TweetManagerUseCase {
@@ -113,7 +114,8 @@ class TweetManager: TweetManagerUseCase {
         manager.request(path: path, model: CommentModel.self, method: .post, params: params, header: headers, completion: completion)
     }
     
-    func tweetAllOwn(page: Int, userId: Int, completion: @escaping ((TweetAllModel?, String?) -> Void)) {
+    //async await tweetAllOwn, tweetAllReplies, tweetAllLiked, tweetSaved.
+    func tweetAllOwn(page: Int, userId: Int) async throws -> TweetAllModel? {
         let path = TweetEndpoint.tweetAllOwn(userId: userId).path
         
         let params: [String: Any] = [
@@ -124,10 +126,10 @@ class TweetManager: TweetManagerUseCase {
             "Authorization": "Bearer \(KeychainManager.shared.retrieve(key: "token") ?? "")"
         ]
         
-        manager.request(path: path, model: TweetAllModel.self, method: .get, params: params, header: headers, completion: completion)
+        return try await manager.request(path: path, model: TweetAllModel.self, method: .get, params: params, header: headers)
     }
     
-    func tweetAllReplies(page: Int, userId: Int, completion: @escaping ((TweetAllModel?, String?) -> Void)) {
+    func tweetAllReplies(page: Int, userId: Int) async throws -> TweetAllModel? {
         let path = TweetEndpoint.tweetAllReplies(userId: userId).path
         
         let params: [String: Any] = [
@@ -138,10 +140,10 @@ class TweetManager: TweetManagerUseCase {
             "Authorization": "Bearer \(KeychainManager.shared.retrieve(key: "token") ?? "")"
         ]
         
-        manager.request(path: path, model: TweetAllModel.self, method: .get, params: params, header: headers, completion: completion)
+        return try await manager.request(path: path, model: TweetAllModel.self, method: .get, params: params, header: headers)
     }
     
-    func tweetAllLiked(page: Int, userId: Int, completion: @escaping ((TweetAllModel?, String?) -> Void)) {
+    func tweetAllLiked(page: Int, userId: Int) async throws -> TweetAllModel? {
         let path = TweetEndpoint.tweetAllLiked(userId: userId).path
         
         let params: [String: Any] = [
@@ -152,10 +154,10 @@ class TweetManager: TweetManagerUseCase {
             "Authorization": "Bearer \(KeychainManager.shared.retrieve(key: "token") ?? "")"
         ]
         
-        manager.request(path: path, model: TweetAllModel.self, method: .get, params: params, header: headers, completion: completion)
+        return try await manager.request(path: path, model: TweetAllModel.self, method: .get, params: params, header: headers)
     }
     
-    func tweetAllSaved(page: Int, userId: Int, completion: @escaping ((TweetAllModel?, String?) -> Void)) {
+    func tweetAllSaved(page: Int, userId: Int) async throws -> TweetAllModel? {
         let path = TweetEndpoint.tweetAllSaved(userId: userId).path
         
         let params: [String: Any] = [
@@ -166,7 +168,7 @@ class TweetManager: TweetManagerUseCase {
             "Authorization": "Bearer \(KeychainManager.shared.retrieve(key: "token") ?? "")"
         ]
         
-        manager.request(path: path, model: TweetAllModel.self, method: .get, params: params, header: headers, completion: completion)
+        return try await manager.request(path: path, model: TweetAllModel.self, method: .get, params: params, header: headers)
     }
 }
 

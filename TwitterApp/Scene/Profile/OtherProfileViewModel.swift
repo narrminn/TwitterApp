@@ -36,74 +36,82 @@ class OtherProfileViewModel {
     
     init(userId: Int) {
         self.userId = userId
-        getOtherProfile()
+//        getOtherProfile()
     }
     
-    func getOtherProfile() {
-        manager.otherProfile(userId: userId){ response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            } else if let response {
-                self.profile = response.data?.user
+    func getOtherProfile() async {
+        do {
+            let response = try await manager.otherProfile(userId: userId)
+            Task { @MainActor in
+                profile = response.data?.user
                 
-                self.getTweetAllOwn()
-                self.getTweetAllReplies()
-                self.getTweetAllLiked()
-                self.getTweetAllSaved()
+                await getTweetAllOwn()
+                await getTweetAllReplies()
+                await getTweetAllLiked()
+                await getTweetAllSaved()
                 
-                self.profileGetSuccess?()
+                profileGetSuccess?()
+            }
+        } catch {
+            Task { @MainActor in
+                errorHandling?(error.localizedDescription)
             }
         }
     }
     
-    func getTweetAllOwn() -> Void {
-        tweetManager.tweetAllOwn(page: (tweetAllOwnResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0) { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            } else if let response {
-                self.tweetAllOwnResponse = response
-                self.tweetAllOwnData.append(contentsOf: response.data?.tweets ?? [])
-                
-                self.getTweetAllOwnSuccess?()
+    func getTweetAllOwn() async {
+        do {
+            let response = try await tweetManager.tweetAllOwn(page: (tweetAllOwnResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0)
+            Task { @MainActor in
+                tweetAllOwnResponse = response
+                tweetAllOwnData.append(contentsOf: response?.data?.tweets ?? [])
+                getTweetAllOwnSuccess?()
+            }
+        } catch {
+            Task { @MainActor in
+                errorHandling?(error.localizedDescription)
+            }
+        }
+    }
+
+    func getTweetAllReplies() async {
+        do {
+            let response = try await tweetManager.tweetAllReplies(page: (tweetAllRepliesResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0)
+            Task { @MainActor in
+                tweetAllRepliesResponse = response
+                tweetAllRepliesData.append(contentsOf: response?.data?.tweets ?? [])
+            }
+        } catch {
+            Task { @MainActor in
+                errorHandling?(error.localizedDescription)
             }
         }
     }
     
-    func getTweetAllReplies() -> Void {
-        tweetManager.tweetAllReplies(page: (tweetAllRepliesResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0) { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            } else if let response {
-                self.tweetAllRepliesResponse = response
-                self.tweetAllRepliesData.append(contentsOf: response.data?.tweets ?? [])
-                
-                self.getTweetAllRepliesSuccess?()
+    func getTweetAllLiked() async {
+        do {
+            let response = try await tweetManager.tweetAllLiked(page: (tweetAllLikedResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0)
+            Task { @MainActor in
+                tweetAllLikedResponse = response
+                tweetAllLikedData.append(contentsOf: response?.data?.tweets ?? [])
+            }
+        } catch {
+            Task { @MainActor in
+                errorHandling?(error.localizedDescription)
             }
         }
     }
     
-    func getTweetAllLiked() -> Void {
-        tweetManager.tweetAllLiked(page: (tweetAllLikedResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0) { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            } else if let response {
-                self.tweetAllLikedResponse = response
-                self.tweetAllLikedData.append(contentsOf: response.data?.tweets ?? [])
-                
-                self.getTweetAllLikedSuccess?()
+    func getTweetAllSaved() async {
+        do {
+            let response = try await tweetManager.tweetAllSaved(page: (tweetAllSavedResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0)
+            Task { @MainActor in
+                tweetAllSavedResponse = response
+                tweetAllSavedData.append(contentsOf: response?.data?.tweets ?? [])
             }
-        }
-    }
-    
-    func getTweetAllSaved() -> Void {
-        tweetManager.tweetAllSaved(page: (tweetAllSavedResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0) { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            } else if let response {
-                self.tweetAllSavedResponse = response
-                self.tweetAllSavedData.append(contentsOf: response.data?.tweets ?? [])
-                
-                self.getTweetAllSavedSuccess?()
+        } catch {
+            Task { @MainActor in
+                errorHandling?(error.localizedDescription)
             }
         }
     }
@@ -113,9 +121,9 @@ class OtherProfileViewModel {
         tweetAllOwnData.removeAll()
     }
     
-    func paginationAllOwn(index: Int) {
+    func paginationAllOwn(index: Int) async {
         if tweetAllOwnData.count - 2 == index && (tweetAllOwnResponse?.meta?.page ?? 0 < (tweetAllOwnResponse?.meta?.totalPage ?? 0)) {
-            getTweetAllOwn()
+            await getTweetAllOwn()
         }
     }
     
@@ -124,9 +132,9 @@ class OtherProfileViewModel {
         tweetAllRepliesData.removeAll()
     }
     
-    func paginationAllReplies(index: Int) {
+    func paginationAllReplies(index: Int) async {
         if tweetAllRepliesData.count - 2 == index && (tweetAllRepliesResponse?.meta?.page ?? 0 < (tweetAllRepliesResponse?.meta?.totalPage ?? 0)) {
-            getTweetAllReplies()
+            await getTweetAllReplies()
         }
     }
     
@@ -135,9 +143,9 @@ class OtherProfileViewModel {
         tweetAllLikedData.removeAll()
     }
     
-    func paginationAllLiked(index: Int) {
+    func paginationAllLiked(index: Int) async {
         if tweetAllLikedData.count - 2 == index && (tweetAllLikedResponse?.meta?.page ?? 0 < (tweetAllLikedResponse?.meta?.totalPage ?? 0)) {
-            getTweetAllLiked()
+            await getTweetAllLiked()
         }
     }
     
@@ -146,19 +154,18 @@ class OtherProfileViewModel {
         tweetAllSavedData.removeAll()
     }
     
-    func paginationAllSaved(index: Int) {
+    func paginationAllSaved(index: Int) async {
         if tweetAllSavedData.count - 2 == index && (tweetAllSavedResponse?.meta?.page ?? 0 < (tweetAllSavedResponse?.meta?.totalPage ?? 0)) {
-            getTweetAllSaved()
+            await getTweetAllSaved()
         }
     }
     
-    func followProfile() {
-        manager.followProfile(userId: userId) { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            } else if let response {
-                self.followProfileSuccess?()
-            }
+    func followProfile() async {
+        do {
+            let _ = try await manager.followProfile(userId: userId)
+            followProfileSuccess?()
+        } catch {
+            errorHandling?(error.localizedDescription)
         }
     }
 }

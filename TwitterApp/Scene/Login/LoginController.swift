@@ -97,6 +97,9 @@ class LoginController: UIViewController {
         _ = KeychainManager.shared.save(key: "name", value: loginModel.data?.user?.name ?? "")
         _ = KeychainManager.shared.save(key: "username", value: loginModel.data?.user?.username ?? "")
         _ = KeychainManager.shared.save(key: "profilePhotoPath", value: loginModel.data?.user?.profilePhotoPath ?? "")
+        _ = KeychainManager.shared.save(key: "bannerPhotoPath", value: loginModel.data?.user?.profileBannerPath ?? "")
+        _ = KeychainManager.shared.save(key: "link", value: loginModel.data?.user?.link ?? "")
+        _ = KeychainManager.shared.save(key: "bio", value: loginModel.data?.user?.bio ?? "")
         
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let sceneDelegate = windowScene.delegate as? SceneDelegate {

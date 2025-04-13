@@ -22,24 +22,34 @@ class FollowUserViewModel {
         self.userId = userId
     }
     
-    func getFollowingUser() {
-        profileManager.followingUser(userId: userId) { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            } else if let response {
-                self.followingUser = response.data?.users ?? []
+    func getFollowingUser() async {
+        do {
+            let response = try await profileManager.followingUser(userId: userId)
+            
+            Task { @MainActor in
+                followingUser = response.data?.users ?? []
+                
                 self.getFollowingUserSuccess?()
+            }
+        } catch {
+            Task { @MainActor in
+                errorHandling?(error.localizedDescription)
             }
         }
     }
     
-    func getFollowersUser() {
-        profileManager.followersUser(userId: userId) { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            } else if let response {
-                self.followersUser = response.data?.users ?? []
+    func getFollowersUser() async {
+        do {
+            let response = try await profileManager.followersUser(userId: userId)
+            
+            Task { @MainActor in
+                followersUser = response.data?.users ?? []
+                
                 self.getFollowersUserSuccess?()
+            }
+        } catch {
+            Task { @MainActor in
+                errorHandling?(error.localizedDescription)
             }
         }
     }

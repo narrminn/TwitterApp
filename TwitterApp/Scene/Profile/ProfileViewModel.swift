@@ -14,6 +14,7 @@ class ProfileViewModel {
     var profile: ProfileModelUser?
     
     var profileGetSuccess: (() -> Void)?
+    
     var errorHandling: ((String) -> Void)?
     
     var getTweetAllOwnSuccess: (() -> Void)?
@@ -31,120 +32,128 @@ class ProfileViewModel {
     var tweetAllLikedData = [TweetAll]()
     var tweetAllSavedData = [TweetAll]()
     
-    init() {
-        getMyProfile()
-    }
+//    init() async {
+//        await getMyProfile()
+//    }
     
-    func getMyProfile() -> Void {
-        manager.myProfile { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            } else if let response {
-                self.profile = response.data?.user
+    func getMyProfile() async {
+        do {
+            let response = try await manager.myProfile()
+            Task { @MainActor in
+                profile = response.data?.user
+                                
+                await getTweetAllOwn()
+                await getTweetAllReplies()
+                await getTweetAllLiked()
+                await getTweetAllSaved()
                 
-                self.getTweetAllOwn()
-                self.getTweetAllReplies()
-                self.getTweetAllLiked()
-                self.getTweetAllSaved()
-                
-                self.profileGetSuccess?()
+                profileGetSuccess?()
+            }
+        } catch {
+            Task { @MainActor in
+                errorHandling?(error.localizedDescription)
             }
         }
     }
     
-    func getTweetAllOwn() -> Void {
-        tweetManager.tweetAllOwn(page: (tweetAllOwnResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0) { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            } else if let response {
-                self.tweetAllOwnResponse = response
-                self.tweetAllOwnData.append(contentsOf: response.data?.tweets ?? [])
-                
-                self.getTweetAllOwnSuccess?()
+    func getTweetAllOwn() async {
+        do {
+            let response = try await tweetManager.tweetAllOwn(page: (tweetAllOwnResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0)
+            Task { @MainActor in
+                tweetAllOwnResponse = response
+                tweetAllOwnData.append(contentsOf: response?.data?.tweets ?? [])
+                getTweetAllOwnSuccess?()
+            }
+        } catch {
+            Task { @MainActor in
+                errorHandling?(error.localizedDescription)
             }
         }
     }
     
-    func getTweetAllReplies() -> Void {
-        tweetManager.tweetAllReplies(page: (tweetAllRepliesResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0) { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            } else if let response {
-                self.tweetAllRepliesResponse = response
-                self.tweetAllRepliesData.append(contentsOf: response.data?.tweets ?? [])
-                
-                self.getTweetAllRepliesSuccess?()
+    func getTweetAllReplies() async {
+        do {
+            let response = try await tweetManager.tweetAllReplies(page: (tweetAllRepliesResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0)
+            Task { @MainActor in
+                tweetAllRepliesResponse = response
+                tweetAllRepliesData.append(contentsOf: response?.data?.tweets ?? [])
+            }
+        } catch {
+            Task { @MainActor in
+                errorHandling?(error.localizedDescription)
             }
         }
     }
     
-    func getTweetAllLiked() -> Void {
-        tweetManager.tweetAllLiked(page: (tweetAllLikedResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0) { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            } else if let response {
-                self.tweetAllLikedResponse = response
-                self.tweetAllLikedData.append(contentsOf: response.data?.tweets ?? [])
-                
-                self.getTweetAllLikedSuccess?()
+    func getTweetAllLiked() async {
+        do {
+            let response = try await tweetManager.tweetAllLiked(page: (tweetAllLikedResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0)
+            Task { @MainActor in
+                tweetAllLikedResponse = response
+                tweetAllLikedData.append(contentsOf: response?.data?.tweets ?? [])
+            }
+        } catch {
+            Task { @MainActor in
+                errorHandling?(error.localizedDescription)
             }
         }
     }
     
-    func getTweetAllSaved() -> Void {
-        tweetManager.tweetAllSaved(page: (tweetAllSavedResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0) { response, errorMessage in
-            if let errorMessage {
-                self.errorHandling?(errorMessage)
-            } else if let response {
-                self.tweetAllSavedResponse = response
-                self.tweetAllSavedData.append(contentsOf: response.data?.tweets ?? [])
-                
-                self.getTweetAllSavedSuccess?()
+    func getTweetAllSaved() async {
+        do {
+            let response = try await tweetManager.tweetAllSaved(page: (tweetAllSavedResponse?.meta?.page ?? 0) + 1, userId: profile?.id ?? 0)
+            Task { @MainActor in
+                tweetAllSavedResponse = response
+                tweetAllSavedData.append(contentsOf: response?.data?.tweets ?? [])
+            }
+        } catch {
+            Task { @MainActor in
+                errorHandling?(error.localizedDescription)
             }
         }
     }
     
     func resetAllOwn() {
         tweetAllOwnResponse = nil
-        tweetAllOwnData.removeAll()
+        tweetAllOwnData = []
     }
     
-    func paginationAllOwn(index: Int) {
+    func paginationAllOwn(index: Int) async {
         if tweetAllOwnData.count - 2 == index && (tweetAllOwnResponse?.meta?.page ?? 0 < (tweetAllOwnResponse?.meta?.totalPage ?? 0)) {
-            getTweetAllOwn()
+            await getTweetAllOwn()
         }
     }
     
     func resetAllReplies() {
         tweetAllRepliesResponse = nil
-        tweetAllRepliesData.removeAll()
+        tweetAllRepliesData = []
     }
     
-    func paginationAllReplies(index: Int) {
+    func paginationAllReplies(index: Int) async {
         if tweetAllRepliesData.count - 2 == index && (tweetAllRepliesResponse?.meta?.page ?? 0 < (tweetAllRepliesResponse?.meta?.totalPage ?? 0)) {
-            getTweetAllReplies()
+            await getTweetAllReplies()
         }
     }
     
     func resetAllLiked() {
         tweetAllLikedResponse = nil
-        tweetAllLikedData.removeAll()
+        tweetAllLikedData = []
     }
     
-    func paginationAllLiked(index: Int) {
+    func paginationAllLiked(index: Int) async {
         if tweetAllLikedData.count - 2 == index && (tweetAllLikedResponse?.meta?.page ?? 0 < (tweetAllLikedResponse?.meta?.totalPage ?? 0)) {
-            getTweetAllLiked()
+            await getTweetAllLiked()
         }
     }
     
     func resetAllSaved() {
         tweetAllSavedResponse = nil
-        tweetAllSavedData.removeAll()
+        tweetAllSavedData = []
     }
     
-    func paginationAllSaved(index: Int) {
+    func paginationAllSaved(index: Int) async {
         if tweetAllSavedData.count - 2 == index && (tweetAllSavedResponse?.meta?.page ?? 0 < (tweetAllSavedResponse?.meta?.totalPage ?? 0)) {
-            getTweetAllSaved()
+            await getTweetAllSaved()
         }
     }
 }

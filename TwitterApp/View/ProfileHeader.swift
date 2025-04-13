@@ -139,6 +139,7 @@ class ProfileHeader: UICollectionReusableView {
     var followButtonTapped: (() -> Void)?
     var selectedProfileChangedAction: ((ProfileFilterOption) -> Void)?
     var isMyProfile = false
+    var editProfileButtonTapped: (() -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -169,11 +170,11 @@ class ProfileHeader: UICollectionReusableView {
         if !isMyProfile { // Follow Button Tapped
             followButtonTapped?()
             
-            var title = editProfileFollowButton.titleLabel?.text == "Follow" ? "Unfollow" : "Follow"
+            let title = editProfileFollowButton.titleLabel?.text == "Follow" ? "Unfollow" : "Follow"
             
             editProfileFollowButton.setTitle(title, for: .normal)
         } else { // Edit Button Tapped
-            
+            editProfileButtonTapped?()
         }
     }
     

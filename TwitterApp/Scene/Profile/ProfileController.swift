@@ -33,17 +33,33 @@ class ProfileController: UIViewController {
         super.viewDidLoad()
         configureUI()
         configureViewModel()
+        
+        getMyProfile()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name("profileUpdated"),
+                                               object: nil,
+                                               queue: nil) { [weak self] _ in
+            self?.pullToRefresh()
+        }
+        
 //        navigationController?.navigationBar.isHidden = true
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
     }
     
     func configureViewModel() {
         viewModel.profileGetSuccess = {
-            self.collectionView.reloadData()
-            self.refreshController.endRefreshing()
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+                self.refreshController.endRefreshing()
+            }
         }
         
         viewModel.getTweetAllOwnSuccess = {
@@ -82,8 +98,14 @@ class ProfileController: UIViewController {
         viewModel.resetAllReplies()
         viewModel.resetAllLiked()
         viewModel.resetAllSaved()
-        
-        viewModel.getMyProfile()
+                
+        getMyProfile()
+    }
+    
+    func getMyProfile() {
+        Task { @MainActor in
+            await viewModel.getMyProfile()
+        }
     }
     
     func configureUI() {
@@ -137,12 +159,20 @@ extension ProfileController: UICollectionViewDelegate, UICollectionViewDataSourc
         var data: TweetCellProtocol?
         
         if selectedFilterbar == .tweets {
+            guard indexPath.row < viewModel.tweetAllOwnData.count else { return cell }
+
             data = viewModel.tweetAllOwnData[indexPath.row]
         } else if selectedFilterbar == .replies {
+            guard indexPath.row < viewModel.tweetAllRepliesData.count else { return cell }
+            
             data = viewModel.tweetAllRepliesData[indexPath.row]
         } else if selectedFilterbar == .likes {
+            guard indexPath.row < viewModel.tweetAllLikedData.count else { return cell }
+            
             data = viewModel.tweetAllLikedData[indexPath.row]
         } else if selectedFilterbar == .savedTweets {
+            guard indexPath.row < viewModel.tweetAllSavedData.count else { return cell }
+            
             data = viewModel.tweetAllSavedData[indexPath.row]
         }
         
@@ -226,14 +256,16 @@ extension ProfileController: UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        if selectedFilterbar == .tweets {
-            viewModel.paginationAllOwn(index: indexPath.row)
-        } else if selectedFilterbar == .replies {
-            viewModel.paginationAllReplies(index: indexPath.row)
-        } else if selectedFilterbar == .likes {
-            viewModel.paginationAllLiked(index: indexPath.row)
-        } else if selectedFilterbar == .savedTweets {
-            viewModel.paginationAllSaved(index: indexPath.row)
+        Task { @MainActor in
+            if selectedFilterbar == .tweets {
+                await viewModel.paginationAllOwn(index: indexPath.row)
+            } else if selectedFilterbar == .replies {
+                await viewModel.paginationAllReplies(index: indexPath.row)
+            } else if selectedFilterbar == .likes {
+                await viewModel.paginationAllLiked(index: indexPath.row)
+            } else if selectedFilterbar == .savedTweets {
+                await viewModel.paginationAllSaved(index: indexPath.row)
+            }
         }
     }
     
@@ -253,6 +285,11 @@ extension ProfileController: UICollectionViewDelegate, UICollectionViewDataSourc
         header.selectedProfileChangedAction = { selectedFilter in
             self.selectedFilterbar = selectedFilter
             self.collectionView.reloadData()
+        }
+        
+        header.editProfileButtonTapped = { [weak self] in
+            let coordinator = EditProfileCoordinator(navigationController: self?.navigationController ?? UINavigationController(), viewController: self)
+            coordinator.start()
         }
         
         return header

@@ -68,8 +68,10 @@ class FollowUserController: UIViewController {
             self.present(Alert.showAlert(title: "Error", message: error), animated: true)
         }
         
-        viewModel.getFollowingUser()
-        viewModel.getFollowersUser()
+        Task { @MainActor in
+            await viewModel.getFollowingUser()
+            await viewModel.getFollowersUser()
+        }
     }
     
     //MARK: - Helpers
