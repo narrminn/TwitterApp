@@ -12,8 +12,8 @@ protocol ProfileHeaderProtocol {
     var profileImage: String? { get }
     var fullName: String { get }
     var username: String { get }
-    var bio: String { get }
-    var link: String { get }
+    var bio: String? { get }
+    var link: String? { get }
     var following: Int { get }
     var follower: Int { get }
     var isFollowing: Bool? { get }
@@ -251,8 +251,8 @@ class ProfileHeader: UICollectionReusableView {
         
         fullNameLabel.text = data.fullName
         usernameLabel.text = "@\(data.username)"
-        bioLabel.text = data.bio
-        linkLabel.text = data.link
+        bioLabel.text = data.bio ?? ""
+        linkLabel.text = data.link ?? ""
         followerLabel.text = "\(data.follower) followers"
         followingLabel.text = "\(data.following) following"
         

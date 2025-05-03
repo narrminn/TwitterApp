@@ -19,4 +19,3 @@ class FileNetworkManager: FileManagerUseCase {
         manager.uploadPhoto(path: path, model: FileUploadModel.self, method: .post, photo: file, header: headers, completion: completion)
     }
 }
-

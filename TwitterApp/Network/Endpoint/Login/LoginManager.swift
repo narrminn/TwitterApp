@@ -34,4 +34,3 @@ class LoginManager: LoginManagerUseCase {
         return try await manager.request(path: path, model: LoginModel.self, method: .post, params: params, encodingType: .json)
     }
 }
-

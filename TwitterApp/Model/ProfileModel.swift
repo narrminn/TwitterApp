@@ -21,8 +21,8 @@ struct ProfileModelData: Codable {
 // MARK: - MyProfileModelUser
 struct ProfileModelUser: Codable, ProfileHeaderProtocol {
     let id: Int?
-    let name, username, email, bio: String
-    let link: String
+    let name, username, email: String
+    let link, bio: String?
     let profilePhotoPath, profilePhotoUUID, profileBannerPath, profileBannerUUID: String?
     let followersCount, followingCount: Int?
     let isFollowing: Bool?

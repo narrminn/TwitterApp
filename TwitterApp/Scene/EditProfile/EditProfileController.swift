@@ -20,6 +20,11 @@ class EditProfileController: UIViewController {
         return tv
     }()
     
+    //MARK: - Properties
+    private var headerView = EditProfileHeader()
+    private var viewModel = EditProfileViewModel()
+    private var currentProfileHeaderTarget: EditProfileHeaderTarget?
+    
     //MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -30,32 +35,14 @@ class EditProfileController: UIViewController {
         configureViewModel()
     }
     
-    //MARK: - Properties
-    private var headerView = EditProfileHeader()
-    private var viewModel = EditProfileViewModel()
-    private var currentProfileHeaderTarget: editProfileHeaderTarget?
-    
     //MARK: - Selectors
-    
     @objc func handleCancel() {
         dismiss(animated: true)
     }
     
     @objc func handleSave() {
-        guard let fullNameCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? EditProfileCell,
-              let usernameCell = tableView.cellForRow(at: IndexPath(row: 1, section: 0)) as? EditProfileCell,
-              let bioCell = tableView.cellForRow(at: IndexPath(row: 2, section: 0)) as? EditProfileCell,
-              let websiteCell = tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? EditProfileCell else {
-            return
-        }
-
-        let name = fullNameCell.infoTextField.text ?? ""
-        let username = usernameCell.infoTextField.text ?? ""
-        let bio = bioCell.bioTextView.text ?? ""
-        let link = websiteCell.infoTextField.text ?? ""
-        
-        Task {@MainActor in
-            await viewModel.updateProfile(name: name, username: username, bio: bio, link: link)
+        Task { @MainActor in
+            await viewModel.updateProfile()
         }
     }
     
@@ -80,32 +67,8 @@ class EditProfileController: UIViewController {
         }
         
         viewModel.updateSuccess = {
-            guard let fullNameCell = self.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? EditProfileCell,
-                  let usernameCell = self.tableView.cellForRow(at: IndexPath(row: 1, section: 0)) as? EditProfileCell,
-                  let bioCell = self.tableView.cellForRow(at: IndexPath(row: 2, section: 0)) as? EditProfileCell,
-                  let websiteCell = self.tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? EditProfileCell else {
-                return
-            }
-
-            let name = fullNameCell.infoTextField.text ?? ""
-            let username = usernameCell.infoTextField.text ?? ""
-            let bio = bioCell.bioTextView.text ?? ""
-            let link = websiteCell.infoTextField.text ?? ""
-            
-            _ = KeychainManager.shared.save(key: "name", value: name)
-            _ = KeychainManager.shared.save(key: "username", value: username)
-            _ = KeychainManager.shared.save(key: "bio", value: bio)
-            _ = KeychainManager.shared.save(key: "link", value: link)
-            
-            if let profilePhoto = self.viewModel.profilePhoto {
-                _ = KeychainManager.shared.save(key: "profilePhotoPath", value: profilePhoto["file_path"] ?? "")
-            }
-            
-            if let bannerPhoto = self.viewModel.bannerPhoto {
-                _ = KeychainManager.shared.save(key: "bannerPhotoPath", value: bannerPhoto["file_path"] ?? "")
-            }
-            
             NotificationCenter.default.post(name: NSNotification.Name("profileUpdated"), object: nil)
+            self.tableView.reloadData()
         }
         
         viewModel.errorHandling = { error in
@@ -160,24 +123,49 @@ class EditProfileController: UIViewController {
     }
 }
 
+//extension EditProfileController: UITableViewDataSource, UITableViewDelegate {
+//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+//        EditProfileOption.allCases.count
+//    }
+//    
+//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "\(EditProfileCell.self)") as! EditProfileCell
+//        
+//        guard let option = EditProfileOption(rawValue: indexPath.row) else { return cell }
+//        
+//        cell.configure(editProfileOption: option)
+//                
+//        return cell
+//    }
+//    
+//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        guard let option = EditProfileOption(rawValue: indexPath.row) else { return 0 }
+//        
+//        return option == .bio ? 100 : 48
+//    }
+//}
+
 extension EditProfileController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        EditProfileOption.allCases.count
+        viewModel.items.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "\(EditProfileCell.self)") as! EditProfileCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "\(EditProfileCell.self)", for: indexPath) as! EditProfileCell
         
-        guard let option = EditProfileOption(rawValue: indexPath.row) else { return cell }
+        let model = viewModel.items[indexPath.row]
+        cell.configure(model: model)
         
-        cell.configure(editProfileOption: option)
-                
+        // live update ViewModel
+        cell.onValueChanged = { [weak self] newValue in
+            self?.viewModel.updateItem(at: indexPath.row, with: newValue)
+        }
+        
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard let option = EditProfileOption(rawValue: indexPath.row) else { return 0 }
-        
-        return option == .bio ? 100 : 48
+        let model = viewModel.items[indexPath.row]
+        return model.type == .bio ? 100 : 48
     }
 }

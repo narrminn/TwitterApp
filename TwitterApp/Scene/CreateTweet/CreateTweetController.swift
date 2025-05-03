@@ -9,6 +9,7 @@ import UIKit
 import PhotosUI
 
 class CreateTweetController: UIViewController {
+    
     //MARK: UI Elements
         
     private lazy var actionButton: UIButton = {
@@ -18,10 +19,10 @@ class CreateTweetController: UIViewController {
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         button.setTitleColor(.white, for: .normal)
-        
-        button.frame = CGRect(x: 0, y: 0, width: 64, height: 32)
+  //      button.isEnabled = (success != nil) ? true : false
+        button.frame = CGRect(x: 0, y: 0, width: 64, height: 34)
         button.layer.cornerRadius = 32 / 2
-
+//        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
@@ -31,7 +32,7 @@ class CreateTweetController: UIViewController {
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         button.setTitleColor(.gray, for: .normal)
-        
+        button.translatesAutoresizingMaskIntoConstraints = false
         button.frame = CGRect(x: 0, y: 0, width: 64, height: 32)
         button.layer.cornerRadius = 32 / 2
 
@@ -44,13 +45,12 @@ class CreateTweetController: UIViewController {
         imageView.clipsToBounds = true
         imageView.setDimensions(width: 48, height: 48)
         imageView.image = UIImage(systemName: "person.circle.fill")
-        
+        imageView.translatesAutoresizingMaskIntoConstraints = false
         if let photo = KeychainManager.shared.retrieve(key: "profilePhotoPath") {
             imageView.loadImage(url: photo)
         }
         
         imageView.layer.cornerRadius = 48 / 2
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         
         return imageView
     }()
@@ -191,15 +191,20 @@ class CreateTweetController: UIViewController {
     }
     
     fileprivate func configureConstraints() {
+        
         view.addSubview(imagePickerButton)
         view.addSubview(actionButton)
         view.addSubview(cancelButton)
         view.addSubview(profileImageView)
         view.addSubview(captionTextView)
+        view.addSubview(captionTextView)
         view.addSubview(imagesCollectionView)
         
-        captionTextView.translatesAutoresizingMaskIntoConstraints = false
+//        [imagePickerButton, actionButton, cancelButton, profileImageView, captionTextView, imagesCollectionView].forEach{ view.addSubview($0)
+//            $0.translatesAutoresizingMaskIntoConstraints = false
+//        }
         
+        captionTextView.translatesAutoresizingMaskIntoConstraints = false
         imagePickerButtonBottomConstraint = imagePickerButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -4)
         imagePickerButtonBottomConstraint.isActive = true
 

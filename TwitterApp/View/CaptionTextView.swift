@@ -8,7 +8,7 @@
 import UIKit
 
 class CaptionTextView: UITextView {
-    
+        
     // MARK: - UI Elements
     let placeholderLabel: UILabel = {
         let label = UILabel()
@@ -17,10 +17,9 @@ class CaptionTextView: UITextView {
         label.text = "What's happening?"
         return label
     }()
-    
+        
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
-        
         backgroundColor = .white
         font = UIFont.systemFont(ofSize: 16)
         isScrollEnabled = false
@@ -54,5 +53,3 @@ class CaptionTextView: UITextView {
         NotificationCenter.default.removeObserver(self)
     }
 }
-
-

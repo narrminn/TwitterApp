@@ -46,8 +46,12 @@ class MainTabController: UITabBarController {
     }
     
     func configureConstraints() {
-        createTweetButton.anchor(bottom: view.safeAreaLayoutGuide.bottomAnchor, right: view.rightAnchor, paddingBottom: 64, paddingRight: 16,
-                            width: 56, height: 56)
+        createTweetButton.anchor(bottom: view.safeAreaLayoutGuide.bottomAnchor,
+                                 right: view.rightAnchor,
+                                 paddingBottom: 64,
+                                 paddingRight: 16,
+                                 width: 56,
+                                 height: 56)
         createTweetButton.layer.cornerRadius = 56 / 2
     }
     

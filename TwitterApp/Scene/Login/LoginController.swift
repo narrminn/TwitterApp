@@ -10,59 +10,56 @@ import UIKit
 class LoginController: UIViewController {
     // MARK: - UI Elements
     private let logoImageView: UIImageView = {
-          let imageView = UIImageView()
-          imageView.image = UIImage(named: "twitter_logo")
-          imageView.contentMode = .scaleAspectFit
-          imageView.translatesAutoresizingMaskIntoConstraints = false
-          return imageView
+        let iv = UIImageView()
+        iv.image = UIImage(named: "TwitterLogo")
+        iv.contentMode = .scaleAspectFit
+        iv.clipsToBounds = true
+        iv.setDimensions(width: 150, height: 150)
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
       }()
     
-    private let emailField: UITextField = {
-        let textField = UITextField()
-        textField.borderStyle = .roundedRect
-        textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        textField.textColor = .black
-        textField.translatesAutoresizingMaskIntoConstraints = false
+    private lazy var emailContainerView: UIView = {
+        let image = UIImage(named: "ic_mail_outline_white_2x-1")
         
-        textField.attributedPlaceholder = NSAttributedString(
-            string: "Email Address",
-            attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
-        )
+        let view = Utilities().inputContainerView(withImage: image ?? UIImage(), textField: emailField)
+        
+        return view
+    }()
+    
+    private lazy var passwordContainerView: UIView = {
+        let image = UIImage(named: "ic_lock_outline_white_2x")
+        
+        let view = Utilities().inputContainerView(withImage: image ?? UIImage(), textField: passwordField)
+        
+        return view
+    }()
+    
+    private let emailField: UITextField = {
+        let textField = Utilities().textField(withPlaceholder: "Email")
         
         return textField
     }()
 
     private let passwordField: UITextField = {
-        let textField = UITextField()
-        textField.borderStyle = .roundedRect
-        textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        textField.textColor = .black
+        let textField = Utilities().textField(withPlaceholder: "Password")
         textField.isSecureTextEntry = true
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        
-        textField.attributedPlaceholder = NSAttributedString(
-            string: "Password",
-            attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
-        )
-        
         return textField
     }()
     
-    private let signInButton: UIButton = {
+    private let loginButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Sign in", for: .normal)
-        button.backgroundColor = UIColor.systemCyan
+        button.setTitle("Log In", for: .normal)
+        button.setTitleColor(.twitterBlue, for: .normal)
+        button.backgroundColor = .white
         button.layer.cornerRadius = 8
-        button.translatesAutoresizingMaskIntoConstraints = false
+        button.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         return button
     }()
     
-    private let signUpButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Sign up", for: .normal)
-        button.backgroundColor = UIColor.systemCyan
-        button.layer.cornerRadius = 8
-        button.translatesAutoresizingMaskIntoConstraints = false
+    private let dontHaveAccountButton: UIButton = {
+        let button = Utilities().attributedButton("Don't have an account?", " Sign Up")
         return button
     }()
     
@@ -72,13 +69,11 @@ class LoginController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupUI()
+        configureUI()
         configureViewModel()
     }
     
     func configureViewModel() {
-        navigationItem.title = "Login"
-                
         viewModel.loginSuccess = { loginModel in
             self.loginSuccess(loginModel: loginModel)
         }
@@ -128,10 +123,9 @@ class LoginController: UIViewController {
         }
     }
 
-    @objc func signInTapped() {
+    @objc func loginTapped() {
         if let email = emailField.text, let password = passwordField.text, !email.isEmpty, !password.isEmpty {
-            
-//            viewModel.login(email: email, password: password)
+        
         Task { @MainActor in
                 await viewModel.loginAsync(email: email, password: password)
             }
@@ -145,45 +139,35 @@ class LoginController: UIViewController {
         coordinator.start()
     }
     
-    private func setupUI() {
-        view.backgroundColor = UIColor.white
+    private func configureUI() {
+        view.backgroundColor = .twitterBlue
+        navigationController?.navigationBar.barStyle = .black
+        navigationController?.navigationBar.isHidden = true
+
+        view.addSubview(loginButton)
+//        view.addSubview(dontHaveAccountButton)
         
-        view.addSubview(logoImageView)
-        view.addSubview(emailField)
-        view.addSubview(passwordField)
-        view.addSubview(signInButton)
-        view.addSubview(signUpButton)
+        loginButton.addTarget(self, action: #selector(loginTapped), for: .touchUpInside)
+        dontHaveAccountButton.addTarget(self, action: #selector(signUpTapped), for: .touchUpInside)
         
-        signInButton.addTarget(self, action: #selector(signInTapped), for: .touchUpInside)
-        signUpButton.addTarget(self, action: #selector(signUpTapped), for: .touchUpInside)
-        
-        setupConstraints()
+        configureConstraints()
     }
     
-    private func setupConstraints() {
-        NSLayoutConstraint.activate([
-            logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 4),
-            logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            logoImageView.widthAnchor.constraint(equalToConstant: 80),
-            logoImageView.heightAnchor.constraint(equalToConstant: 80),
-                        
-            emailField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 150),
-            emailField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
-            emailField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
-            
-            passwordField.topAnchor.constraint(equalTo: emailField.bottomAnchor, constant: 20),
-            passwordField.leadingAnchor.constraint(equalTo: emailField.leadingAnchor),
-            passwordField.trailingAnchor.constraint(equalTo: emailField.trailingAnchor),
-            
-            signInButton.topAnchor.constraint(equalTo: passwordField.bottomAnchor, constant: 30),
-            signInButton.leadingAnchor.constraint(equalTo: emailField.leadingAnchor),
-            signInButton.trailingAnchor.constraint(equalTo: emailField.trailingAnchor),
-            signInButton.heightAnchor.constraint(equalToConstant: 40),
-            
-            signUpButton.topAnchor.constraint(equalTo: signInButton.bottomAnchor, constant: 20),
-            signUpButton.leadingAnchor.constraint(equalTo: emailField.leadingAnchor),
-            signUpButton.trailingAnchor.constraint(equalTo: emailField.trailingAnchor),
-            signUpButton.heightAnchor.constraint(equalToConstant: 40)
-        ])
+    private func configureConstraints() {
+        view.addSubview(logoImageView)
+        logoImageView.centerX(inView: view, topAnchor: view.safeAreaLayoutGuide.topAnchor)
+        
+        let stack = UIStackView(arrangedSubviews: [emailContainerView, passwordContainerView, loginButton])
+        stack.axis = .vertical
+        stack.spacing = 20
+        stack.distribution = .fillEqually
+        
+        view.addSubview(stack)
+        stack.anchor(top: logoImageView.bottomAnchor, left: view.leftAnchor,
+                     right: view.rightAnchor, paddingLeft: 32, paddingRight: 32)
+        
+        view.addSubview(dontHaveAccountButton)
+        dontHaveAccountButton.anchor(left: view.leftAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor,
+                                     right: view.rightAnchor, paddingLeft: 40, paddingRight: 40)
     }
 }

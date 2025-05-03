@@ -72,8 +72,8 @@ class EditProfileHeader: UIView {
     }()
     
     //MARK: - Properties
-    private var currentTarget: editProfileHeaderTarget?
-    var changeImageHandler: ((UIImage, editProfileHeaderTarget) -> Void)?
+    private var currentTarget: EditProfileHeaderTarget?
+    var changeImageHandler: ((UIImage, EditProfileHeaderTarget) -> Void)?
     
     //MARK: - Lifecycle
     

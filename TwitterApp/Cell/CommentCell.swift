@@ -52,6 +52,7 @@ class CommentCell: UICollectionViewCell {
         super.init(frame: frame)
         
         configureUI()
+        configureConstraints()
     }
 
     required init?(coder: NSCoder) {
@@ -62,8 +63,6 @@ class CommentCell: UICollectionViewCell {
     
     fileprivate func configureUI() {
         backgroundColor = .white
-        
-        configureConstraints()
     }
     
     fileprivate func configureConstraints() {

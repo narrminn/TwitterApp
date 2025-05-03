@@ -10,119 +10,101 @@ import UIKit
 class RegisterController: UIViewController {
     // MARK: - UI Elements
     private let logoImageView: UIImageView = {
-          let imageView = UIImageView()
-          imageView.image = UIImage(named: "twitter_logo")
-          imageView.contentMode = .scaleAspectFit
-          imageView.translatesAutoresizingMaskIntoConstraints = false
-          return imageView
+        let iv = UIImageView()
+        iv.image = UIImage(named: "TwitterLogo")
+        iv.contentMode = .scaleAspectFit
+        iv.clipsToBounds = true
+        iv.setDimensions(width: 150, height: 150)
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
       }()
     
+    private lazy var emailContainerView: UIView = {
+        let image = UIImage(named: "ic_mail_outline_white_2x-1")
+        
+        let view = Utilities().inputContainerView(withImage: image ?? UIImage(), textField: emailField)
+        
+        return view
+    }()
+    
+    private lazy var passwordContainerView: UIView = {
+        let image = UIImage(named: "ic_lock_outline_white_2x")
+        
+        let view = Utilities().inputContainerView(withImage: image ?? UIImage(), textField: passwordField)
+        
+        return view
+    }()
+    
+    private lazy var fullnameContainerView: UIView = {
+        let image = UIImage(named: "ic_person_outline_white_2x")
+        
+        let view = Utilities().inputContainerView(withImage: image ?? UIImage(), textField: nameField)
+        
+        return view
+    }()
+    
+    private lazy var usernameContainerView: UIView = {
+        let image = UIImage(named: "ic_person_outline_white_2x")
+        
+        let view = Utilities().inputContainerView(withImage: image ?? UIImage(), textField: userNameField)
+        
+        return view
+    }()
+    
+    
     private let emailField: UITextField = {
-        let textField = UITextField()
-        textField.borderStyle = .roundedRect
-        textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        textField.textColor = .black
-        textField.translatesAutoresizingMaskIntoConstraints = false
-
-        textField.attributedPlaceholder = NSAttributedString(
-            string: "Email Address",
-            attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
-        )
-        
-        return textField
-    }()
-    
-    private let nameField: UITextField = {
-        let textField = UITextField()
-        textField.borderStyle = .roundedRect
-        textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        textField.textColor = .black
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        
-        textField.attributedPlaceholder = NSAttributedString(
-            string: "Your Name",
-            attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
-        )
-        
-        return textField
-    }()
-    
-    private let userNameField: UITextField = {
-        let textField = UITextField()
-        textField.borderStyle = .roundedRect
-        textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        textField.textColor = .black
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        
-        textField.attributedPlaceholder = NSAttributedString(
-            string: "Your username",
-            attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
-        )
+        let textField = Utilities().textField(withPlaceholder: "Email")
         
         return textField
     }()
 
     private let passwordField: UITextField = {
-        let textField = UITextField()
-        textField.borderStyle = .roundedRect
-        textField.backgroundColor = UIColor(white: 1, alpha: 0.2)
-        textField.textColor = .black
+        let textField = Utilities().textField(withPlaceholder: "Password")
         textField.isSecureTextEntry = true
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        
-        textField.attributedPlaceholder = NSAttributedString(
-            string: "Password",
-            attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
-        )
+        return textField
+    }()
+    
+    private let nameField: UITextField = {
+        let textField = Utilities().textField(withPlaceholder: "Full name")
         
         return textField
     }()
     
-    @objc private let signUpButton: UIButton = {
+    private let userNameField: UITextField = {
+        let textField = Utilities().textField(withPlaceholder: "Username")
+        
+        return textField
+    }()
+    
+    private let registerButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Sign up", for: .normal)
-        button.backgroundColor = UIColor.systemCyan
+        button.setTitle("Sign Up", for: .normal)
+        button.setTitleColor(.twitterBlue, for: .normal)
+        button.backgroundColor = .white
         button.layer.cornerRadius = 8
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    private let socialStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 16
-        stackView.distribution = .equalSpacing
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-    
-    private func createSocialButton(imageName: String) -> UIButton {
-        let button = UIButton()
-        button.setImage(UIImage(named: imageName), for: .normal)
-        button.layer.cornerRadius = 25
-        button.clipsToBounds = true
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = UIColor(white: 1, alpha: 0.2)
         button.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        button.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         return button
-    }
+    }()
+    
+    private let alreadyHaveAccountButton: UIButton = {
+        let button = Utilities().attributedButton("Already have an account?", " Log In")
+        return button
+    }()
     
     // MARK: - Properties
     private var viewModel = RegisterViewModel()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupUI()
+        configureUI()
         configureViewModel()
     }
     
     func configureViewModel() {
-        navigationItem.title = "Sign up"
-                
         viewModel.registerSuccess = { userId in
-            let coordinator = RegisterApproveCoordinator(userId: userId, navigationController: self.navigationController ?? UINavigationController())
+            let coordinator = RegisterApproveCoordinator(userId: userId, email: self.emailField.text ?? "", navigationController: self.navigationController ?? UINavigationController())
             coordinator.start()
         }
         
@@ -142,63 +124,39 @@ class RegisterController: UIViewController {
         }
     }
     
-    
-    
-    private func setupUI() {
-        view.backgroundColor = UIColor.white
+   @objc func signInTapped() {
+        navigationController?.popViewController(animated: true)
+    }
+
+    private func configureUI() {
+        view.backgroundColor = .twitterBlue
+        navigationController?.navigationBar.barStyle = .black
+        navigationController?.navigationBar.isHidden = true
         
-        view.addSubview(logoImageView)
-        view.addSubview(emailField)
-        view.addSubview(nameField)
-        view.addSubview(userNameField)
-        view.addSubview(passwordField)
-        view.addSubview(signUpButton)
-        view.addSubview(socialStackView)
+        view.addSubview(registerButton)
+        view.addSubview(alreadyHaveAccountButton)
         
-//        let googleButton = createSocialButton(imageName: "google_icon")
-//        let appleButton = createSocialButton(imageName: "apple_icon")
-//        let facebookButton = createSocialButton(imageName: "facebook_icon")
-//        
-//        socialStackView.addArrangedSubview(googleButton)
-//        socialStackView.addArrangedSubview(appleButton)
-//        socialStackView.addArrangedSubview(facebookButton)
+        registerButton.addTarget(self, action: #selector(signUpTapped), for: .touchUpInside)
+        alreadyHaveAccountButton.addTarget(self, action: #selector(signInTapped), for: .touchUpInside)
         
-        signUpButton.addTarget(self, action: #selector(signUpTapped), for: .touchUpInside)
-        
-        setupConstraints()
+        configureConstraints()
     }
     
-    private func setupConstraints() {
-        NSLayoutConstraint.activate([
-            logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 4),
-            logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            logoImageView.widthAnchor.constraint(equalToConstant: 80),
-            logoImageView.heightAnchor.constraint(equalToConstant: 80),
-            
-            emailField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 150),
-            emailField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
-            emailField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
-            
-            nameField.topAnchor.constraint(equalTo: emailField.bottomAnchor, constant: 20),
-            nameField.leadingAnchor.constraint(equalTo: emailField.leadingAnchor),
-            nameField.trailingAnchor.constraint(equalTo: emailField.trailingAnchor),
-            
-            userNameField.topAnchor.constraint(equalTo: nameField.bottomAnchor, constant: 20),
-            userNameField.leadingAnchor.constraint(equalTo: emailField.leadingAnchor),
-            userNameField.trailingAnchor.constraint(equalTo: emailField.trailingAnchor),
-            
-            passwordField.topAnchor.constraint(equalTo: userNameField.bottomAnchor, constant: 20),
-            passwordField.leadingAnchor.constraint(equalTo: emailField.leadingAnchor),
-            passwordField.trailingAnchor.constraint(equalTo: emailField.trailingAnchor),
-            
-            signUpButton.topAnchor.constraint(equalTo: passwordField.bottomAnchor, constant: 30),
-            signUpButton.leadingAnchor.constraint(equalTo: emailField.leadingAnchor),
-            signUpButton.trailingAnchor.constraint(equalTo: emailField.trailingAnchor),
-            signUpButton.heightAnchor.constraint(equalToConstant: 50),
-            
-            socialStackView.topAnchor.constraint(equalTo: signUpButton.bottomAnchor, constant: 40),
-            socialStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            socialStackView.heightAnchor.constraint(equalToConstant: 50)
-        ])
+    private func configureConstraints() {
+        view.addSubview(logoImageView)
+        logoImageView.centerX(inView: view, topAnchor: view.safeAreaLayoutGuide.topAnchor)
+        
+        let stack = UIStackView(arrangedSubviews: [emailContainerView, passwordContainerView,fullnameContainerView, usernameContainerView, registerButton])
+        stack.axis = .vertical
+        stack.spacing = 20
+        stack.distribution = .fillEqually
+        
+        view.addSubview(stack)
+        stack.anchor(top: logoImageView.bottomAnchor, left: view.leftAnchor,
+                     right: view.rightAnchor, paddingLeft: 32, paddingRight: 32)
+        
+        view.addSubview(alreadyHaveAccountButton)
+        alreadyHaveAccountButton.anchor(left: view.leftAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor,
+                                     right: view.rightAnchor, paddingLeft: 40, paddingRight: 40)
     }
 }

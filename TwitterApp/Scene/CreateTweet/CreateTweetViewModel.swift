@@ -10,7 +10,7 @@ import UIKit
 class CreateTweetViewModel {
     var fileManager = FileNetworkManager()
     var tweetManager = TweetManager()
-    
+
     var fileUploadSuccess: ((FileUploadModel) -> Void)?
     var tweetStoreSuccess: (() -> Void)?
     var errorHandling: ((String) -> Void)?

@@ -32,6 +32,3 @@ struct LikedUser: Codable, ImageNameTableProtocol {
         case profilePhotoPath = "profile_photo_path"
     }
 }
-
-
-

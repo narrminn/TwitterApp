@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum editProfileHeaderTarget {
+enum EditProfileHeaderTarget {
     case profile
     case header
 }

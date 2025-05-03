@@ -38,6 +38,7 @@ class EditProfileCell: UITableViewCell {
     }()
     
     //MARK: - Properties
+    var onValueChanged: ((String) -> Void)?
     
     //MARK: - Lifecycle
     
@@ -54,7 +55,7 @@ class EditProfileCell: UITableViewCell {
     //MARK: - Selectors
     
     @objc func handleUpdateUserInfo() {
-        
+        onValueChanged?(infoTextField.text ?? "")
     }
     
     //MARK: - Helpers
@@ -80,27 +81,27 @@ class EditProfileCell: UITableViewCell {
         
         bioTextView.anchor(top: topAnchor, left: titleLabel.rightAnchor, bottom: bottomAnchor ,right: rightAnchor, paddingTop: 4, paddingLeft: 16, paddingRight: 8)
     }
-    
-    func configure(editProfileOption: EditProfileOption) {
-        titleLabel.text = editProfileOption.description
+
+    func configure(model: EditProfileModel) {
+        titleLabel.text = model.type.description
         
-        switch editProfileOption {
-        case .fullName:
-            infoTextField.isHidden = false
-            bioTextView.isHidden = true
-            infoTextField.text = KeychainManager.shared.retrieve(key: "name") ?? ""
-        case .username:
-            infoTextField.isHidden = false
-            bioTextView.isHidden = true
-            infoTextField.text = KeychainManager.shared.retrieve(key: "username") ?? ""
+        switch model.type {
         case .bio:
             infoTextField.isHidden = true
             bioTextView.isHidden = false
-            bioTextView.text = KeychainManager.shared.retrieve(key: "bio") ?? ""
-        case .website:
+            bioTextView.text = model.value
+            bioTextView.delegate = self
+        default:
             infoTextField.isHidden = false
             bioTextView.isHidden = true
-            infoTextField.text = KeychainManager.shared.retrieve(key: "link") ?? ""
+            infoTextField.text = model.value
         }
+    }
+}
+
+// UITextViewDelegate
+extension EditProfileCell: UITextViewDelegate {
+    func textViewDidChange(_ textView: UITextView) {
+        onValueChanged?(textView.text ?? "")
     }
 }
