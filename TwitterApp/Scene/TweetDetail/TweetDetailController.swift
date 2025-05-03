@@ -20,16 +20,16 @@ class TweetDetailController: UIViewController {
     }()
     
     private var replyTextView: UITextView = {
-            let textView = UITextView()
-            textView.translatesAutoresizingMaskIntoConstraints = false
-            textView.layer.borderColor = UIColor.lightGray.cgColor
-            textView.layer.borderWidth = 1
-            textView.layer.cornerRadius = 8
-            textView.font = UIFont.systemFont(ofSize: 16)
-            textView.text = "Tweet your reply"
-            textView.textColor = .lightGray
-            return textView
-        }()
+        let textView = UITextView()
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.layer.borderColor = UIColor.lightGray.cgColor
+        textView.layer.borderWidth = 1
+        textView.layer.cornerRadius = 8
+        textView.font = UIFont.systemFont(ofSize: 16)
+        textView.text = "Tweet your reply"
+        textView.textColor = .lightGray
+        return textView
+    }()
     
     private var replyTextField: UITextField = {
         let textField = UITextField()

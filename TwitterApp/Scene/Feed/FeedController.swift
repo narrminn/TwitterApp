@@ -37,6 +37,7 @@ class FeedController: UIViewController {
         
         configureUI()
         configureViewModel()
+        configurenavigationBar()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -50,6 +51,13 @@ class FeedController: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    //MARK: - Selectors
+    
+    @objc func handleSettingsLogoTapped() {
+        let coordinator = SettingCoordinator(navigationController: navigationController!, viewController: self)
+        coordinator.start()
     }
     
     // MARK: - Helpers
@@ -82,12 +90,55 @@ class FeedController: UIViewController {
         viewModel.getTweetAll()
     }
     
+    fileprivate func configurenavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .white
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.black]
+
+        // Apply the appearance configurations to the navigation bar
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
+        navigationController?.navigationBar.tintColor = .systemBlue
+        navigationController?.isNavigationBarHidden = false
+        
+        // Set a custom logo as the left bar button item
+        if let logoImage = UIImage(named: "settingsLogo") {
+            // Resize the image to a suitable size
+            let resizedImage = logoImage.resized(to: CGSize(width: 24, height: 24)) // Adjust size as needed
+            let logoButton = UIBarButtonItem(image: resizedImage, style: .plain, target: self, action: #selector(handleSettingsLogoTapped))
+            
+            // Set the custom logo as the left bar button item
+            navigationItem.leftBarButtonItem = logoButton
+            // Ensure the logo is aligned correctly to the left
+            navigationItem.rightBarButtonItem?.tintColor = .systemBlue
+            
+            navigationItem.rightBarButtonItem = UIBarButtonItem(customView: UIView()) // boş görünməz view
+        }
+    }
+
+    
     func configureUI() {
         view.backgroundColor = .white
-        
+
         let imageView = UIImageView(image: UIImage(named: "twitter_logo_blue"))
         imageView.contentMode = .scaleAspectFit
-        navigationItem.titleView = imageView
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+
+        let containerView = UIView()
+        containerView.addSubview(imageView)
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            imageView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            imageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            imageView.heightAnchor.constraint(equalToConstant: 48), // ölçüləri tənzimlə
+            imageView.widthAnchor.constraint(equalToConstant: 48)
+        ])
+
+        navigationItem.titleView = containerView
         
         configureConstraints()
     }
@@ -177,6 +228,17 @@ extension UILabel {
         label.text = text
         let targetSize = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
         return label.sizeThatFits(targetSize)
+    }
+}
+
+// Extension to resize UIImage
+extension UIImage {
+    func resized(to size: CGSize) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(size, false, self.scale)
+        self.draw(in: CGRect(origin: .zero, size: size))
+        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return resizedImage ?? self
     }
 }
 
