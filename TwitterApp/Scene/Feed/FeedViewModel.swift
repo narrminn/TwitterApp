@@ -8,7 +8,7 @@
 import Foundation
 
 class FeedViewModel {
-    var manager = TweetManager()
+    var manager: TweetManagerUseCase
     
     var tweetGetSuccess: (() -> Void)?
     var errorHandling: ((String) -> Void)?
@@ -16,7 +16,9 @@ class FeedViewModel {
     var tweetAllResponse: TweetAllModel?
     var tweetAllData = [TweetAll]()
     
-    init() {
+    init(manager: TweetManagerUseCase) {
+        self.manager = manager
+        
         getTweetAll()
     }
     

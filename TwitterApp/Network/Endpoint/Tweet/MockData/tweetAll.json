@@ -1,0 +1,266 @@
+{
+    "message": "Datalar gətirildi",
+    "data": {
+        "tweets": [
+            {
+                "id": 28,
+                "created_by": 13,
+                "description": "adsfdsf",
+                "created_at": "25.04.2025",
+                "like_count": 0,
+                "comment_count": 0,
+                "retweet_count": 0,
+                "is_liked": false,
+                "is_saved_bookmarked": false,
+                "can_edit": false,
+                "creator": {
+                    "id": 13,
+                    "name": "Farman Allahverdiyev Coder",
+                    "username": "Farman1919",
+                    "profile_photo_path": "/storage/imes/2025/04/680a1374ce02d.jpg"
+                },
+                "tweet_files": []
+            },
+            {
+                "id": 25,
+                "created_by": 13,
+                "description": "sadasdsd",
+                "created_at": "22.04.2025",
+                "like_count": 1,
+                "comment_count": 3,
+                "retweet_count": 0,
+                "is_liked": false,
+                "is_saved_bookmarked": false,
+                "can_edit": false,
+                "creator": {
+                    "id": 13,
+                    "name": "Farman Allahverdiyev Coder",
+                    "username": "Farman1919",
+                    "profile_photo_path": "/storage/imes/2025/04/680a1374ce02d.jpg"
+                },
+                "tweet_files": [
+                    {
+                        "id": 20,
+                        "tweet_id": 25,
+                        "file_uuid": "9ebc65a9-719e-444b-aee3-663639eba5a9",
+                        "file_path": "/storage/imes/2025/04/6807781e6a49f.jpg"
+                    },
+                    {
+                        "id": 21,
+                        "tweet_id": 25,
+                        "file_uuid": "9ebc65a8-a414-4196-bdf1-53f7cce1d1b5",
+                        "file_path": "/storage/imes/2025/04/6807781dd9938.jpg"
+                    },
+                    {
+                        "id": 22,
+                        "tweet_id": 25,
+                        "file_uuid": "9ebc65a8-b92a-4b90-923f-8392a0484077",
+                        "file_path": "/storage/imes/2025/04/6807781de82c7.jpeg"
+                    },
+                    {
+                        "id": 23,
+                        "tweet_id": 25,
+                        "file_uuid": "9ebc65a8-df1e-4c91-b977-e2195edc9f4c",
+                        "file_path": "/storage/imes/2025/04/6807781e0eb9f.jpeg"
+                    }
+                ]
+            },
+            {
+                "id": 24,
+                "created_by": 13,
+                "description": "sadasdsd",
+                "created_at": "22.04.2025",
+                "like_count": 0,
+                "comment_count": 0,
+                "retweet_count": 0,
+                "is_liked": false,
+                "is_saved_bookmarked": false,
+                "can_edit": false,
+                "creator": {
+                    "id": 13,
+                    "name": "Farman Allahverdiyev Coder",
+                    "username": "Farman1919",
+                    "profile_photo_path": "/storage/imes/2025/04/680a1374ce02d.jpg"
+                },
+                "tweet_files": [
+                    {
+                        "id": 16,
+                        "tweet_id": 24,
+                        "file_uuid": "9ebc65a9-719e-444b-aee3-663639eba5a9",
+                        "file_path": "/storage/imes/2025/04/6807781e6a49f.jpg"
+                    },
+                    {
+                        "id": 17,
+                        "tweet_id": 24,
+                        "file_uuid": "9ebc65a8-a414-4196-bdf1-53f7cce1d1b5",
+                        "file_path": "/storage/imes/2025/04/6807781dd9938.jpg"
+                    },
+                    {
+                        "id": 18,
+                        "tweet_id": 24,
+                        "file_uuid": "9ebc65a8-b92a-4b90-923f-8392a0484077",
+                        "file_path": "/storage/imes/2025/04/6807781de82c7.jpeg"
+                    },
+                    {
+                        "id": 19,
+                        "tweet_id": 24,
+                        "file_uuid": "9ebc65a8-df1e-4c91-b977-e2195edc9f4c",
+                        "file_path": "/storage/imes/2025/04/6807781e0eb9f.jpeg"
+                    }
+                ]
+            },
+            {
+                "id": 23,
+                "created_by": 7,
+                "description": "By gun profil sehifesinin collections I yazdim",
+                "created_at": "31.03.2025",
+                "like_count": 0,
+                "comment_count": 0,
+                "retweet_count": 0,
+                "is_liked": false,
+                "is_saved_bookmarked": false,
+                "can_edit": true,
+                "creator": {
+                    "id": 7,
+                    "name": "Narmeena",
+                    "username": "A.nrmn",
+                    "profile_photo_path": "/storage/imes/2025/05/6814e0dea1bdb.jpg"
+                },
+                "tweet_files": []
+            },
+            {
+                "id": 22,
+                "created_by": 7,
+                "description": "Coding days",
+                "created_at": "28.03.2025",
+                "like_count": 4,
+                "comment_count": 19,
+                "retweet_count": 0,
+                "is_liked": true,
+                "is_saved_bookmarked": true,
+                "can_edit": true,
+                "creator": {
+                    "id": 7,
+                    "name": "Narmeena",
+                    "username": "A.nrmn",
+                    "profile_photo_path": "/storage/imes/2025/05/6814e0dea1bdb.jpg"
+                },
+                "tweet_files": []
+            },
+            {
+                "id": 21,
+                "created_by": 7,
+                "description": "hello Guys.",
+                "created_at": "28.03.2025",
+                "like_count": 3,
+                "comment_count": 1,
+                "retweet_count": 0,
+                "is_liked": true,
+                "is_saved_bookmarked": true,
+                "can_edit": true,
+                "creator": {
+                    "id": 7,
+                    "name": "Narmeena",
+                    "username": "A.nrmn",
+                    "profile_photo_path": "/storage/imes/2025/05/6814e0dea1bdb.jpg"
+                },
+                "tweet_files": [
+                    {
+                        "id": 14,
+                        "tweet_id": 21,
+                        "file_uuid": "9e8a7471-66ad-447d-8bf2-73d4ee21434f",
+                        "file_path": "/storage/imes/2025/03/67e6bd3296db9.jpg"
+                    },
+                    {
+                        "id": 15,
+                        "tweet_id": 21,
+                        "file_uuid": "9e8a7472-034e-471a-8347-e7559b52de7c",
+                        "file_path": "/storage/imes/2025/03/67e6bd3309ac3.jpg"
+                    }
+                ]
+            },
+            {
+                "id": 20,
+                "created_by": 7,
+                "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type",
+                "created_at": "28.03.2025",
+                "like_count": 2,
+                "comment_count": 0,
+                "retweet_count": 0,
+                "is_liked": true,
+                "is_saved_bookmarked": true,
+                "can_edit": true,
+                "creator": {
+                    "id": 7,
+                    "name": "Narmeena",
+                    "username": "A.nrmn",
+                    "profile_photo_path": "/storage/imes/2025/05/6814e0dea1bdb.jpg"
+                },
+                "tweet_files": []
+            },
+            {
+                "id": 19,
+                "created_by": 7,
+                "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when",
+                "created_at": "28.03.2025",
+                "like_count": 1,
+                "comment_count": 0,
+                "retweet_count": 0,
+                "is_liked": false,
+                "is_saved_bookmarked": false,
+                "can_edit": true,
+                "creator": {
+                    "id": 7,
+                    "name": "Narmeena",
+                    "username": "A.nrmn",
+                    "profile_photo_path": "/storage/imes/2025/05/6814e0dea1bdb.jpg"
+                },
+                "tweet_files": []
+            },
+            {
+                "id": 18,
+                "created_by": 7,
+                "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard",
+                "created_at": "28.03.2025",
+                "like_count": 2,
+                "comment_count": 0,
+                "retweet_count": 0,
+                "is_liked": true,
+                "is_saved_bookmarked": false,
+                "can_edit": true,
+                "creator": {
+                    "id": 7,
+                    "name": "Narmeena",
+                    "username": "A.nrmn",
+                    "profile_photo_path": "/storage/imes/2025/05/6814e0dea1bdb.jpg"
+                },
+                "tweet_files": []
+            },
+            {
+                "id": 17,
+                "created_by": 7,
+                "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lor",
+                "created_at": "28.03.2025",
+                "like_count": 2,
+                "comment_count": 0,
+                "retweet_count": 0,
+                "is_liked": true,
+                "is_saved_bookmarked": false,
+                "can_edit": true,
+                "creator": {
+                    "id": 7,
+                    "name": "Narmeena",
+                    "username": "A.nrmn",
+                    "profile_photo_path": "/storage/imes/2025/05/6814e0dea1bdb.jpg"
+                },
+                "tweet_files": []
+            }
+        ]
+    },
+    "meta": {
+        "total": 26,
+        "page": 1,
+        "limit": 10,
+        "total_page": 3
+    }
+}

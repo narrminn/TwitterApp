@@ -25,7 +25,7 @@ class FeedController: UIViewController {
     }()
     //MARK: - Properties
     
-    var viewModel = FeedViewModel()
+    var viewModel = FeedViewModel(manager: TweetManager())
     var baseViewModel = TweetBaseViewModel()
     
     var refreshController = UIRefreshControl()
